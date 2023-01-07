@@ -20,6 +20,12 @@ library(sf)
 
 
 ```{r}
+hospital <- read_csv('data/hos_geocoded.csv')
+
+```
+
+
+```{r}
 TN_census_tract <- st_read('data/tl_2021_47_tract/')
 ```
 
@@ -38,11 +44,39 @@ tn
 #1400000US47001020201
 
 library(stringr)
-tn$GEOID <- tn$Geo_ID%>%
-  str_extract_all("US(\\d+)")%>%
-  str_extract_all("(\\d+)")
+# tn$GEOID <- tn$Geo_ID%>%
+#   str_extract_all("US(\\d+)")%>%
+#   str_extract_all("(\\d+)")
   
+```
 
+
+```{r}
+library(stringr)
+tn <- tn %>%
+   dplyr::mutate(GEOID = str_extract(Geo_ID, "\\d+$"))
+tn
+```
+
+
+```{r}
+class(tn$GEOID)
+#class(TN_census_tract)
+```
+
+
+```{r}
+#merge the TN shape file to the tract data
+tn_shape <- merge(TN_census_tract, tn, by="GEOID")
+
+```
+
+```{r}
+ggplot()+geom_sf(data= TN_census_tract)
+```
+
+```{r}
+ggplot()+geom_sf(data= tn_shape, aes(fill = Total_Population))
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
