@@ -1,0 +1,110 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tibble)
+library(ggmap)
+```
+
+
+```{r}
+hos_gi <- read_csv('./data/Hospital_General_Information.csv')
+
+
+```
+
+
+```{r}
+#creating a combined address column to use in ggmap
+
+hos_gi2 <- unite(hos_gi, col='comp_address', c('Address', 'City', 'State', 'ZIP Code'), sep=', ')
+```
+
+```{r}
+geocoded <- data.frame(stringsAsFactors = FALSE)
+
+for(i in 294:nrow(hos_gi2))
+#for (i in 1:3)
+{
+  # Print("Working...")
+  result <- geocode(hos_gi2$comp_address[i], output = "latlona", source = "google")
+  hos_gi2$lon[i] <- as.numeric(result[1])
+  hos_gi2$lat[i] <- as.numeric(result[2])
+  #hos_gi2$geoAddress[i] <- as.character(result[3])
+}
+
+# Write a CSV file containing origAddress to the working directory
+write.csv(hos_gi2, "data/hos_geocoded.csv", row.names=FALSE)
+```
+
+```{r}
+hos_gi2%>%
+  tail(5)
+```
+
+
+```{r}
+TN_pop_inc <- read_csv('./data/TN_pop_inc.csv')
+```
+
+```{r}
+geocoded_TN <- data.frame(stringsAsFactors = FALSE)
+
+for(i in 1:nrow(TN_pop_inc))
+#for (i in 1:3)
+{
+  # Print("Working...")
+  result <- geocode(TN_pop_inc$NAME[i], output = "latlona", source = "google")
+  TN_pop_inc$lon[i] <- as.numeric(result[1])
+  TN_pop_inc$lat[i] <- as.numeric(result[2])
+  #hos_gi2$geoAddress[i] <- as.character(result[3])
+}
+
+# Write a CSV file containing origAddress to the working directory
+write.csv(TN_pop_inc, "data/TN_geocoded.csv", row.names=FALSE)
+```
+
+
+```{r}
+US_pop_inc <- read_csv('./data/US_pop_inc.csv')
+```
+
+```{r}
+for(i in 1:nrow(US_pop_inc))
+#for (i in 1:3)
+{
+  # Print("Working...")
+  result <- geocode(US_pop_inc$NAME[i], output = "latlona", source = "google")
+  US_pop_inc$lon[i] <- as.numeric(result[1])
+  US_pop_inc$lat[i] <- as.numeric(result[2])
+  #hos_gi2$geoAddress[i] <- as.character(result[3])
+}
+
+# Write a CSV file containing origAddress to the working directory
+write.csv(US_pop_inc, "data/US_pop_inc_geocoded.csv", row.names=FALSE)
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

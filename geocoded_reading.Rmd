@@ -1,0 +1,96 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tibble)
+library(ggmap)
+
+library(sf)
+library(leaflet)
+library(htmltools)
+library(scales)
+```
+
+```{r}
+#read the geocoded hos and county files as csv
+hospital <-read_csv('data/hos_geocoded.csv')
+US_county <- read_csv('data/US_pop_inc_geocoded.csv')
+```
+
+```{r}
+str(hospital)
+```
+
+```{r}
+# PLOT SCATTERPLOT
+# - we'll do this as a quick data-check
+ggplot() +
+  geom_point(data = hospital, aes(x = lon, y = lat), alpha = .05)
+
+```
+
+
+```{r}
+#str(US_county)
+ggplot() +
+  geom_point(data = US_county, aes(x = lon, y = lat), alpha = .05)
+```
+
+```{r}
+library(stringr)
+hospital[c('street', 'city', 'sate', 'zip_code')] <- str_split_fixed(hospital$comp_address, ',', 4)
+```
+
+```{r}
+na_lon <- hospital[is.na(hospital$lon),]
+na_lon
+```
+
+```{r}
+na_lat <- hospital[is.na(hospital$lat),]
+na_lat
+```
+```{r}
+hos_latlon_fil <- hospital%>%
+  filter_at(vars(lon, lat), all_vars(!is.na(.)))
+```
+
+
+```{r}
+hospital_sf = st_as_sf(hos_latlon_fil, coords = c('lon', 'lat'),
+                         crs = 4326)
+```
+
+```{r}
+leaflet(options = leafletOptions(minZoom = 3)) %>%
+  addProviderTiles(provider = "CartoDB.Positron") %>%
+  setView(lng = -86.7816, lat = 36.1627, zoom = 6) %>%
+  setMaxBounds(lng1 = min(hospital_sf$lng), 
+          lat1 = min(hospital_sf$lat), 
+          lng2 = max(hospital_sf$lng), 
+          lat2 = max(hospital_sf$lat)) %>%
+  addCircleMarkers(data = hospital_sf, radius = 1)
+```
+```{r}
+fitBounds(lng1 = min(table$lng), 
+          lat1 = min(table$lat), 
+          lng2 = max(table$lng), 
+          lat2 = max(table$lat))
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
