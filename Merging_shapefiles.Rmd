@@ -31,6 +31,7 @@ TN_census_tract <- st_read('data/tl_2021_47_tract/')
 
 ```{r}
 US_census <- read_csv('./data/US_census.csv')
+UScensus_age <- read_csv('./data/UScensus_age.csv')
 ```
 
 ```{r}
@@ -38,6 +39,13 @@ US_census <- read_csv('./data/US_census.csv')
 tn <- US_census[68680:70380,]
 tn
 ```
+
+```{r}
+tn_age <- UScensus_age[68680:70380,]
+tn_age
+
+```
+
 
 ```{r}
 #making the GEOID column so that the shape fie can be merged with census
@@ -58,6 +66,13 @@ tn <- tn %>%
 tn
 ```
 
+```{r}
+tn_age <- tn_age %>%
+   dplyr::mutate(GEOID = str_extract(Geo_ID, "\\d+$"))
+tn_age
+```
+
+
 
 ```{r}
 class(tn$GEOID)
@@ -72,12 +87,23 @@ tn_shape <- merge(TN_census_tract, tn, by="GEOID")
 ```
 
 ```{r}
+tn_age_shape <- merge(TN_census_tract, tn_age, by="GEOID")
+```
+
+
+
+```{r}
 ggplot()+geom_sf(data= TN_census_tract)
 ```
 
 ```{r}
 ggplot()+geom_sf(data= tn_shape, aes(fill = Total_Population))
 ```
+
+```{r}
+ggplot()+geom_sf(data= tn_age_shape, aes(fill = Total_Population))
+```
+
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
