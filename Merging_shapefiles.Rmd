@@ -15,12 +15,24 @@ library(readr)
 library(tibble)
 library(ggmap)
 library(sf)
-
+library(leaflet)
+library(htmltools)
+library(scales)
 ```
 
 
 ```{r}
 hospital <- read_csv('data/hos_geocoded.csv')
+
+hos_gi <- read_csv('./data/Hospital_General_Information.csv')
+col_names <- colnames(hos_gi)
+col_names
+
+```
+```{r}
+hos_gi2 <- hos_gi[,c(1:6)]
+
+hos_st <- merge(hos_gi2, hospital, by = c("Facility ID","Facility Name"))
 
 ```
 
@@ -103,6 +115,100 @@ ggplot()+geom_sf(data= tn_shape, aes(fill = Total_Population))
 ```{r}
 ggplot()+geom_sf(data= tn_age_shape, aes(fill = Total_Population))
 ```
+# finding the distance of the nearest hospital from the TN_tracs
+
+```{r}
+#there are missing values in lat lon of hospital so we are sub-seting it to have only the ones with non missing values
+
+hos_latlon_fil <- hos_st%>%
+  filter_at(vars(lon, lat), all_vars(!is.na(.)))
+hospital_rds <- saveRDS(hos_latlon_fil, 'data/hospital_rds.rds')
+
+hospital_rds <- readRDS('data/hospital_rds.rds')
+hospital_sf = st_as_sf(hospital_rds, coords = c("lon", "lat"), 
+                 crs = 4326)
+tn_age_sf = st_as_sf(tn_age_shape, coords = c('INTPTLON', 'INTPTLON'),
+                         crs = 4326)
+
+```
+
+```{r}
+#transforming the tn_age to get the centroid for nearest search
+
+tn_trans <- st_transform(tn_age_shape, crs = 4326)
+
+
+#st_centroid(tn_trans$geometry)
+tn_trans <- tn_trans %>%
+  mutate(centriod = st_centroid(tn_trans$geometry))
+
+
+```
+
+
+
+#### Now we have the sf objects we are going to compare the geometry columns across the data sets hospital_sf and tn_age_sf to find the nearest hospital and the distance from that to the tract.
+
+```{r}
+nearest <- st_nearest_feature(tn_trans, hospital_sf)
+
+#converting the nearest vector into the distance column of TN census
+
+dist <- st_distance(tn_trans, 
+                    hospital_sf[nearest,], by_element = TRUE) %>%
+    units::set_units(mi)
+tn_trans$distance <- dist
+
+
+
+# Map tract  to nearest hospital and put in merged_df
+tntract_hos <- bind_cols(hospital_sf[nearest, ] %>%
+                           st_drop_geometry(),
+                            tn_trans)
+                           
+
+str(tntract_hos)
+
+tntract_hos <- st_as_sf(tntract_hos, crs = 4326)
+
+```
+
+```{r}
+#to create the polygon around a point in meters (0.5 miles = 804.5 meters, 1 mile = 1609.34 meters)
+
+sf_circles <- st_buffer(hospital_sf, dist = 804.5) #to create the polygon around a point
+```
+
+```{r}
+map <- leaflet(options = leafletOptions(minZoom = 6)) %>%
+  addProviderTiles(provider = "CartoDB.Positron") %>%
+  setView(lng = -86.7816, lat = 36.1627, zoom = 10) %>%
+  setMaxBounds(lng1 = -86.7816 + 1, 
+               lat1 = 36.1627 + 1, 
+               lng2 = -86.7816 - 1, 
+               lat2 = 36.1627 - 1) %>%
+    addCircleMarkers(data = hospital_sf,
+                   radius = 1,
+                   color = "white",
+                   weight = 0.25,
+                   fillColor = "red",
+                   fillOpacity = 0.75,
+                   label = ~City)%>%
+  addPolygons(data = sf_circles, 
+              weight = 1, 
+              opacity = 0.5)%>%
+  addCircleMarkers(data = tntract_hos,
+                   radius = 1,
+                   color = "white",
+                   weight = 0.25,
+                   fillColor = "green",
+                   fillOpacity = 0.75,
+                   label = ~Tract)
+
+map
+```
+
+
 
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
