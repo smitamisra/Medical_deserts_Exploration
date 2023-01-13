@@ -1,0 +1,224 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(dplyr)  
+```
+
+```{r}
+tncounty_health <- read_excel('./data/2022 County Health Rankings Tennessee Data - v1.xlsx',
+                             sheet = 'Ranked Measure Data',
+                             range = 'A2:IO98',
+                             col_names = TRUE)
+```
+```{r}
+tncounty_health_select <- 
+  tncounty_health%>%
+  select(2,3,5,6,9,10,14,18,22,26,34,37,38,41,83,115,116,117,118,123,124, 125,126,127,128,189, 190,193,194,197,200,203,206, 246,249)
+xyz_names <- colnames(tncounty_health_select)
+view(xyz_names)
+
+tncountyhealth <- tncounty_health_select%>%
+  rename("State" = "State",
+  "County" = "County",                                      
+ "deaths<75_totalNo" = "Deaths" ,                                    
+ "YPLL_per100K" = "Years of Potential Life Lost Rate",          
+ "YPLL_Z_score" = "Z-Score...9",                                
+ "AIAN_YPLL_ per100K" = "YPLL Rate (AIAN)",                         
+"Asian_YPLL_ per100K" = "YPLL Rate (Asian)" ,                         
+"Black_YPLL_ per100K" = "YPLL Rate (Black)",                          
+ "Hispanic_YPLL_ per100K" = "YPLL Rate (Hispanic)" ,                      
+"White_YPLL_ per100K" = "YPLL Rate (white)" ,                         
+"Physically_Unhealthy_Days(PUD)_AvgNo" = "Average Number of Physically Unhealthy Days",
+"PUD_Z_score" = "Z-Score...37",                            
+"Mentally_Unhealthy_Days(MUD)_AvgNo" = "Average Number of Mentally Unhealthy Days",
+"MUD_Z_score" = "Z-Score...41",                               
+"Driving_Deaths_totalNo."="# Driving Deaths" ,                          
+"PCP_totalNo" = "# Primary Care Physicians" ,                 
+"PCP_per100K" = "Primary Care Physicians Rate",            
+ "People/PCP_ratio" = "Primary Care Physicians Ratio" ,
+ "PCP_Z_score" = "Z-Score...118" ,                             
+"MHP_totalNo" = "# Mental Health Providers",                  
+"MHP_per100K" = "Mental Health Provider Rate",            
+"NumberPeople/MHP_ration" = "Mental Health Provider Ratio" ,              
+"MHP_Z_score" =  "Z-Score...126",
+"Preventable_Hospitalization_per100K"= "Preventable Hospitalization Rate",
+"Preventable_Hspitalization_Z_score" =  "Z-Score...128", 
+"InjuryDeaths(ID)_totalNo" =  "# Injury Deaths",                          
+"ID_per_100K" =  "Injury Death Rate" ,                       
+"ID_Z_score" =  "Z-Score...193" ,                             
+"AIAN_ID_per_100K" =   "Injury Death Rate (AIAN)" ,                
+"Asian_ID_per_100K" =  "Injury Death Rate (Asian)",                  
+"Black_ID_per_100K" =   "Injury Death Rate (Black)" ,    
+"Hispanic_ ID_per_100K" = "Injury Death Rate (Hispanic)",               
+"White_ ID_per_100K" = "Injury Death Rate (white)"  ,                
+"Percent_long_commute" = "% Long Commute - Drives Alone" ,             
+"long_commute_Z_score" ="Z-Score...249" ) 
+
+tncountyhealth <- saveRDS(tncountyhealth, "data/tncounty_health.rds")
+
+```
+
+```{r}
+tncountyhealth%>%
+  group_by(County)%>%
+  summarise_at(c("deaths<75_totalNo", "YPLL_per100K", "PCP_per100K"), mean, na.rm=TRUE)
+```
+```{r}
+tncountyhealth%>%
+  group_by(County)%>%
+  summarise_at(-c("County", "People/PCP_ratio","NumberPeople/MHP_ration"), 
+               mean, na.rm=TRUE)
+```
+
+
+```{r}
+tncountyhealth.groupby(County).mean()
+```
+
+
+```{r}
+tncountyhealth <- readRDS("data/tncounty_health.rds")
+tncountyhealth %>%
+  group_by(County)%>%
+    ggplot(aes(x = County, y = PCP_per100K)) + 
+  geom_col() 
+```
+
+```{r}
+colnames(tntract_hos)
+```
+
+```{r}
+tn_regions <- read_csv('data/tn_divisions.csv')
+
+library(stringr)
+tn_regions <- tn_regions%>%
+  mutate(county = str_replace_all(county, " County", ""))%>%
+  rename("County" = "county")
+
+tncounty_region_health <- merge(tn_regions, tncountyhealth, by='County')
+  
+saveRDS(tncounty_region_health, 'data/tncounty_region_health.rds')
+
+```
+
+```{r}
+summary(tntract_hos)
+
+```
+
+
+```{r}
+tntract_hos_region <- tntract_hos %>%
+  mutate(County = str_extract(tntract_hos$Tract, "(?<=, )[^,]*(?=,)"))%>%
+  mutate(County = str_replace_all(County, " County", ""))
+
+
+```
+
+```{r}
+#tntract_hos %>%
+  #mutate(County = str_extract(tntract_hos$Tract, "(?<=, )[^,]*(?=,)"))%>%
+  #select(County)%>%
+  #view()
+
+```
+
+
+```{r}
+tn_temp1 <- merge(tntract_hos_region, tn_regions, by='County')
+tn_temp1$County
+
+summary(tn_temp1)
+```
+```{r}
+tn_regions%>%
+  group_by(Division)%>%
+ count()%>%
+  rename("#County" = n)
+
+```
+```{r}
+tn_temp1%>%
+  group_by(County)%>%
+ count()
+```
+```{r}
+summary(hospital_sf)
+```
+
+```{r}
+hospital_sf%>%
+  group_by(State == "TN")%>%
+  count()
+
+
+hospital_sf%>%
+  group_by(c(`Hospital Type`))%>%
+  count()
+
+hospital_sf%>%
+  group_by(c(`Hospital Ownership`))%>%
+  count()
+
+tn_temp1%>%
+  mutate(pop_density = log(Total_Population/ALAND))
+```
+
+```{r}
+tn_temp1%>%
+  group_by(Division)%>%
+  ggplot(aes(y=`Hospital Type`, fill = Division, ))+
+  geom_bar(position = 'dodge')
+```
+
+
+
+```{r}
+summary(tn_temp1$distance)
+```
+
+
+```{r}
+tn_temp1 <- tn_temp1 %>%
+  mutate(distance = as.numeric(distance))%>%
+  mutate(group = 
+           case_when(
+             distance <= 0.5  ~ "close",
+             distance > 0.5 & distance <=1.5 ~ "nearby",
+             distance > 1.5 & distance <= 2.5 ~ "mid",
+             distance > 2.5 & distance <= 3.5 ~ "far",
+             distance > 3.5 & distance <= 4.5 ~ "away",
+             distance > 4.5 ~ "beyond"
+    )
+  )
+
+hist(tn_temp1$distance)
+
+tn_temp1%>%
+  group_by(group)%>%
+  count()
+    
+  
+  
+```
+
+```{r}
+saveRDS(tn_temp1, "data/tn_temp1.rds")
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

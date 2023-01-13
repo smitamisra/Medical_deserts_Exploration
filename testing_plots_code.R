@@ -15,7 +15,7 @@ leaflet(options = leafletOptions(minZoom = 3)) %>%
   addPolygons(data = sf_circles, 
               weight = 1, 
               opacity = 0.5)%>%
-  addPolygons(data = tntract_hos,
+  addPolygons(data = tn_temp1,
                    #radius = 1,
                    color = "black",
                    weight = 0.75,

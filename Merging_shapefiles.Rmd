@@ -170,13 +170,17 @@ tntract_hos <- bind_cols(hospital_sf[nearest, ] %>%
 str(tntract_hos)
 
 tntract_hos <- st_as_sf(tntract_hos, crs = 4326)
+tntract_hos_rds <- saveRDS(tntract_hos, 'data/tntract_hos.rds')
 
 ```
 
 ```{r}
 #to create the polygon around a point in meters (0.5 miles = 804.5 meters, 1 mile = 1609.34 meters)
 
-sf_circles <- st_buffer(hospital_sf, dist = 804.5) #to create the polygon around a point
+sf_circles <- st_buffer(hospital_sf, dist = 804.5)#to create the polygon around a point
+sf_circles_rds <- saveRDS(sf_circles, 'data/sf_circles.rds')
+hospital_sf_rds <- saveRDS(hospital_sf, 'data/hospita_sf.rds')
+sf_circles <- readRDS('data/sf_circles.rds')
 ```
 
 ```{r}
