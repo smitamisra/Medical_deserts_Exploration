@@ -170,7 +170,7 @@ hospital_sf%>%
   group_by(c(`Hospital Ownership`))%>%
   count()
 
-tn_temp1%>%
+tn_temp1 <- tn_temp1%>%
   mutate(pop_density = log(Total_Population/ALAND))
 ```
 
@@ -208,13 +208,31 @@ tn_temp1%>%
   group_by(group)%>%
   count()
     
-  
+g 
   
 ```
 
 ```{r}
 saveRDS(tn_temp1, "data/tn_temp1.rds")
 ```
+
+```{r}
+tn_temp1%>%
+  group_by(Division)%>%
+  ggplot(aes(y= Division, fill = tn_temp1$group, ))+
+  geom_bar(position = 'dodge')
+```
+
+```{r}
+tn_temp1 <- readRDS('data/tn_temp1.rds')
+tn_health <- readRDS("data/tncounty_region_health.rds")
+summary(tn_temp1)
+```
+```{r}
+tncr <- readRDS("data/tncounty_region_health.rds")
+colnames(tncr)
+```
+
 
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.

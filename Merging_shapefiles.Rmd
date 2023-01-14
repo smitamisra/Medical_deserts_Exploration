@@ -39,6 +39,11 @@ hos_st <- merge(hos_gi2, hospital, by = c("Facility ID","Facility Name"))
 
 ```{r}
 TN_census_tract <- st_read('data/tl_2021_47_tract/')
+
+tn_conty_shape <- st_read('data/tl_2021_us_county/')
+
+tnc_sh <- tn_conty_shape %>%
+  filter(STATEFP == 47)
 ```
 
 ```{r}
@@ -210,6 +215,13 @@ map <- leaflet(options = leafletOptions(minZoom = 6)) %>%
                    label = ~Tract)
 
 map
+```
+
+
+```{r}
+tnc_sh <- merge(tnc_sh, tn_heath, by.x= "NAME", by.y = "County")
+tnhealth_sf <- st_as_sf(tnc_sh, coords = c('INTPTLON', 'INTPTLON'),
+                         crs = 4326)
 ```
 
 
