@@ -23,8 +23,8 @@ shinyServer(function(input, output) {
   output$Hospital_Type <- renderPlot({
     filtered = filtered()
     y= 'Hospital Type'
-    #y = 'Hospital Ownership'
-    fill = 'State'
+    fill = 'Hospital Ownership'
+    #fill = 'State'
     ggplot(data = filtered, aes(y = .data[[y]], 
                                 #fill = .data[[fill]]
     )) +
@@ -32,9 +32,9 @@ shinyServer(function(input, output) {
   })
   output$Hospital_Ownership <- renderPlot({
     filtered = filtered()
-    #y= 'Hospital Type'
+    fill = 'Hospital Type'
     y = 'Hospital Ownership'
-    fill = 'State'
+    #fill = 'State'
     ggplot(data = filtered, aes(y = .data[[y]], 
                                 #fill = .data[[fill]]
     )) +
@@ -57,7 +57,7 @@ shinyServer(function(input, output) {
                        weight = 0.25,
                        fillColor = "red",
                        fillOpacity = 0.75,
-                       label = ~City)
+                       label = ~City)#label pop needs to be created
       # addPolygons(data = sf_circles, 
       #             weight = 1, 
       #             opacity = 0.5)%>%

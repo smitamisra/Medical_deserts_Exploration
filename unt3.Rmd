@@ -309,6 +309,130 @@ tract_sum_tocounty%>%
 
 
 ```{r}
+tn_temp1 %>% 
+  group_by(County) %>% 
+  summarize(num_ZipCode = n_distinct(`Zip Code`, na.rm=FALSE))
+```
+
+
+
+```{r}
+## plot the tract choosing a ZIPCOde on the leafletmap with nearest hospital
+
+leaflet(options = leafletOptions(minZoom = 3)) %>%
+  addProviderTiles(provider = "CartoDB.Positron") %>%
+  setView(lng = -86.7816, lat = 36.1627, zoom = 6) %>%
+  setMaxBounds(lng1 = min(-86.7816 - 1), 
+               lat1 = min(36.1627 - 1), 
+               lng2 = max(-86.7816 + 1), 
+               lat2 = max(36.1627 + 1)) %>%
+  addCircleMarkers(data = hospital_sf%>%
+                    filter(State == "TN"),
+                   radius = 1,
+                   color = "white",
+                   weight = 0.25,
+                   fillColor = "red",
+                   fillOpacity = 0.75,
+                   label = ~City)%>%
+  addPolygons(data = sf_circles%>%
+                     filter(State == "TN"), 
+              weight = 1, 
+              opacity = 0.5)%>%
+  addPolygons(data = tn_temp1 %>%
+                filter(County == "Clay"),
+                   color = "black",
+                   weight = 0.75,
+                   fillColor = "yellow",
+                   fillOpacity = 0.05,
+                   label = ~NAME)
+ggplot()+geom_sf(data= tntract_hos, aes(fill = Total_Population))
+
+```
+```{r}
+leaflet(options = leafletOptions(minZoom = 3)) %>%
+  addProviderTiles(provider = "CartoDB.Positron") %>%
+  setView(lng = -86.7816, lat = 36.1627, zoom = 6) %>%
+  setMaxBounds(lng1 = min(-86.7816 - 1), 
+               lat1 = min(36.1627 - 1), 
+               lng2 = max(-86.7816 + 1), 
+               lat2 = max(36.1627 + 1)) %>%
+  addPolygons(data = tn_temp1 %>%
+                filter(County == "Clay"),
+                   color = "black",
+                   weight = 0.75,
+                   fillColor = "yellow",
+                   fillOpacity = 0.05,
+                   label = ~`Facility Name`)
+  addCircleMarkers(data = hospital_sf%>%
+                     radius = 1,
+                   color = "white",
+                   weight = 0.25,
+                   fillColor = "red",
+                   fillOpacity = 0.75,
+                   label = ~City)%>%
+  addPolygons(data = sf_circles%>% 
+              weight = 1, 
+              opacity = 0.5)
+  
+  addPolygons(data = tn_temp1 %>%
+                filter(County == "Clay"),
+                   color = "black",
+                   weight = 0.75,
+                   fillColor = "yellow",
+                   fillOpacity = 0.05,
+                   label = ~NAME)
+```
+
+```{r}
+tn_temp1%>%
+  filter(County == "Clay")%>%
+  select(distance)
+```
+
+```{r}
+tntemP_list%>%
+  view()
+
+
+popup_hos <-
+        paste(
+          "<b>TN_Division:</b>", tn_temp1$Division, "<br>",
+          "<b>TN_County:</b>", tn_temp1$County, "<br>",
+          "<b>TN_censustract:</b>", tn_temp1$NAMELSAD, "<br>",
+          "<b>Distance_to_nearest_Hospital(miles):</b>", tn_temp1$distance, "<br>",
+          "<b>Nearest_Hospital:</b>", tn_temp1$`Facility ID`, "<br>",
+          "<b>Hospital_address:</b>", tn_temp1$comp_address, "<br>",
+          "<b>Hospital_Phone#:</b>", tn_temp1$`Phone Number`, "<br>",
+          "<b>Hospital_Type:</b>", tn_temp1$`Hospital Type`, "<br>",
+          "<b>Hospital_Ownership:</b>", tn_temp1$`Hospital Ownership`, "<br>",
+          "<b>Emergency Services:</b>", tn_temp1$`Emergency Services`, "<br>")
+          
+          
+          
+   
+```
+
+
+```{r}
+filtered_tract <- tn_temp1%>%
+  filter(County == "Davidson")
+DT::renderDataTable({
+    filtered_tract()[, c("NAMELSAD", "Divison", 
+    "distance", "group", "Facility Name", "State", "Median_Household_Income", "Median_Age" )]
+})
+```
+```{r}
+state <- hospital_sf%>%
+  st_drop_geometry()%>%
+  group_by(State)%>%
+  summarise(state = n_distinct(State))
+
+print(state)
+```
+
+
+
+```{r}
 list_name <- df$colname
 ```
 
