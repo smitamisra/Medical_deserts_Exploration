@@ -1,0 +1,319 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(shiny)
+library(plotly)
+library(readxl)
+library(DT)
+
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tibble)
+library(ggmap)
+library(sf)
+library(leaflet)
+library(htmltools)
+library(scales)
+```
+
+
+```{r}
+
+#read the data files
+hospital_rds <- readRDS('data/hospital_rds.rds')
+hospital_sf = st_as_sf(hospital_rds, coords = c("lon", "lat"), 
+                 crs = 4326)
+sf_circles <- readRDS("data/sf_circles.rds")
+tn_temp1 <- readRDS("data/tn_temp1.rds")
+tn_heath <- readRDS("data/tncounty_region_health.rds")
+tnhealth_sf <- readRDS("data/tnhealth_sf.rds")
+tncounty_hos <- readRDS("data/tncounty_hos.rds")
+tncounty_long_hos <- readRDS("data/tncounty_long_hos.rds")
+
+
+```
+
+```{r}
+#render the hospital as per the states
+leaflet(options = leafletOptions(minZoom = 3)) %>%
+  addProviderTiles(provider = "CartoDB.Positron") %>%
+  setView(lng = -86.7816, lat = 36.1627, zoom = 6) %>%
+  setMaxBounds(lng1 = min(hospital_sf$lng), 
+               lat1 = min(hospital_sf$lat), 
+               lng2 = max(hospital_sf$lng), 
+               lat2 = max(hospital_sf$lat)) %>%
+  addCircleMarkers(data = hospital_sf,
+                   radius = 1,
+                   color = "white",
+                   weight = 0.25,
+                   fillColor = "red",
+                   fillOpacity = 0.75,
+                   label = ~City)%>%
+  addPolygons(data = sf_circles, 
+              weight = 1, 
+              opacity = 0.5)
+```
+
+```{r}
+#Choosing the TN_county to render the tract maps around the hospitals
+
+leaflet(options = leafletOptions(minZoom = 3)) %>%
+  addProviderTiles(provider = "CartoDB.Positron") %>%
+  setView(lng = -86.7816, lat = 36.1627, zoom = 6) %>%
+  setMaxBounds(lng1 = min(-86.7816 - 1), 
+               lat1 = min(36.1627 - 1), 
+               lng2 = max(-86.7816 + 1), 
+               lat2 = max(36.1627 + 1)) %>%
+  addCircleMarkers(data = hospital_sf%>%
+                     filter(State == "TN"),
+                   radius = 1,
+                   color = "white",
+                   weight = 0.25,
+                   fillColor = "red",
+                   fillOpacity = 0.75,
+                   label = ~City)%>%
+  addPolygons(data = sf_circles%>%
+                     filter(State == "TN"), 
+              weight = 1, 
+              opacity = 0.5)%>%
+  addPolygons(data = tnhealth_sf,
+                   color = "black",
+                   weight = 0.75,
+                   fillColor = "yellow",
+                   fillOpacity = 0.25,
+                   label = ~NAME)
+ggplot()+geom_sf(data= tntract_hos, aes(fill = Total_Population))
+
+
+
+```
+
+
+N
+```{r}
+tn_temp1%>%
+  group_by(Division)%>%
+  ggplot(aes(y= Division, fill = tn_temp1$group, ))+
+  geom_bar(position = 'dodge')
+```
+
+```{r}
+filtered = hospital_sf
+
+#x = 'Hospital Type'
+y = 'Hospital Ownership'
+fill = 'State'
+ggplot(data = filtered, aes(y = .data[[y]], fill = .data[[fill]]
+      )) +
+      geom_bar()  
+      # facet_wrap(vals$facet_wrap) +
+      # xlab(vals$x) + 
+      # ggtitle("Relationship among chosen variables") +
+      # theme(text = element_text(size = 15),
+      #       legend.text = element_text(),
+      #       plot.title = element_text(size = rel(2)),
+      #       axis.text.x = element_text(angle = 90, hjust = 0.2))
+```
+
+
+```{r}
+tn_temp1 <- tn_temp1%>%
+  mutate(Median_Age = as.numeric(Median_Age))%>%
+  mutate(Median_Household_Income = as.numeric(Median_Household_Income))%>%
+  mutate(Median_Family_Income = as.numeric(Median_Family_Income))
+saveRDS(tn_temp1, "data/tn_temp1.rds")
+tn_temp1 <- readRDS("data/tn_temp1.rds")
+
+#Scatter plot with linear relationship between population and median_income superimposed on the graphic
+ggplot(tn_temp1%>%
+         group_by(County),
+       aes(x = Total_Population, 
+           y = Median_Household_Income, color=Division, na.rm=TRUE)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
+
+
+#Note this code is not working
+# Step 1
+tn_temp1 %>% 
+#Step 2
+group_by(County)%>%  
+#Step 3
+summarise(mean_median_age = mean(Median_Age, na.rm=TRUE),
+          mean_median_houseincome = mean(Median_Household_Income,na.rm=TRUE))%>%   
+#Step 4
+ggplot(aes(x = mean_median_age, y = mean_median_houseincome, na.rm+TRUE)) +
+    geom_point(stat = "identity") +
+    geom_smooth(method='lm')+
+    theme_classic() +
+    labs(
+        x = "Median_Age",
+        y = "Median_House_holdincome",
+        title = paste(
+            "Scatter plot with linear relationship between population and median_income superimposed on the graphic"
+        )
+    )
+
+
+
+```
+```{r}
+library(units)
+ggplot(tncounty_hos, aes(x = distance, y = PUD_Z_score, fill=Division)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "lm") + 
+  theme_minimal() + 
+  #scale_x_continuous(limits = c(0, 15)) + 
+  labs(title = "Effect of distance to hospital on physical health TN-counties-region",
+       x = "Distance to nearest hospital",
+       y = "Physically Unhealth Days(Z_score)")
+```
+
+```{r}
+library(units)
+ggplot(tncounty_hos, aes(x = distance, y = MUD_Z_score, fill=Division)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "lm") + 
+  theme_minimal() + 
+  #scale_x_continuous(limits = c(0, 15)) + 
+  labs(title = "Effect of distance to hospital on mental health in TN-counties-region",
+       x = "Distance to nearest hospital",
+       y = "Mentally Unhealth Days(Z_score)")
+```
+```{r}
+lm(formula = "PUD_Z_score ~distance", data = tncounty_hos)%>%
+  summary()
+```
+```{r}
+tncounty_hos%>%
+ group_by(Division)%>%
+  summarise(n_distinct(NAME))
+```
+```{r}
+tncounty_long_hos%>%
+  group_by(Division)%>%
+  summarise(n_distinct(NAME))
+```
+```{r}
+sum_variable <- tn_temp1%>%
+  st_drop_geometry()%>%
+  group_by(County)%>%
+  summarise(Total_Population = sum(Total_Population),
+            Race_White = sum(Race_White),
+            Race_Black = sum(Race_Black),
+            Race_AIAN = sum(Race_AI_AN, na.rm = TRUE),
+            Race_Asian = sum(Race_Asian),
+            Race_PINH = sum(Race_PI_NH))
+
+ tncounty_hos <- merge(sum_variable, tncounty_hos, by.x='County', by.y='NAME')
+```
+
+```{r}
+tncounty_hos%>%
+  group_by(Division)%>%
+  summarise(YPLL_per100K = weighted.mean(YPLL_per100K, Total_Population),
+            YPLL_White_per100K = weighted.mean(`White_YPLL_ per100K`, Race_White, na.rm=TRUE),
+            YPLL_Black_per100K = weighted.mean(`Black_YPLL_ per100K`, Race_Black, na.rm=TRUE))
+            #YPLL_AIAN_per100K = weighted.mean(`AIAN_YPLL_ per100K`, replace_na(Race_AIAN, 0), 
+                                              #na.rm =TRUE))
+            #YPLL_Asian_per100K = weighted.mean(`Asian_YPLL_ per100K`, Race_Asian, na.rm= TRUE))
+            #  YPLL_PINH_per100K = weighted.mean(YPLL_per100K, Race_PINH))
+```
+
+```{r}
+tncounty_hos%>%
+  select(County, `Asian_YPLL_ per100K`, Race_Asian)%>%
+  view()
+```
+
+```{r}
+#scatterplot/diviosn
+#y= response (YPLL, Physical helath, Mental_health, Driving, Injury_deaths, Preventable Hospitalization, Race(white/black_YPLL), Race(white/black_IDC))
+#x= dependent (distance, PCP, Long_commuter)
+#facet = Division
+#color= 
+
+library(units)
+ggplot(tncounty_hos, aes(x = distance, y = YPLL_per100K)) + 
+  facet_grid("Division")+
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "lm") + 
+  theme_minimal() + 
+  #scale_x_continuous(limits = c(0, 15)) + 
+  labs(title = "Effect of distance to hospital on Years of Potential Life Lost Rate in TN-counties-region",
+       x = "Distance to nearest hospital",
+       y = "YPLL/100K")
+
+tncounty_hos%>%
+  colnames()
+```
+
+
+```{r}
+lm(formula = "PUD_Z_score ~distance + PCP_per100K", data = tncounty_hos)%>%
+  summary()
+```
+
+```{r}
+tncounty_hos%>%
+  summary
+tncounthos_list%>%
+  view()
+```
+
+
+
+```{r}
+
+#a kernel density plot can show the overall shape of the distribution of median home values in our dataset:
+ggplot(tncounty_hos, aes(x = PCP_per100K, fill = Division)) + 
+  geom_density(alpha = 0.3)
+```
+
+```{r}
+library(ggbeeswarm)
+p= ggplot(tncounty_hos, aes(x = YPLL_per100K, y = PCP_per100K, 
+                         color = Preventable_Hospitalization_per100K)) +
+  geom_quasirandom(alpha = 0.5) +
+  #geom_density(alpha=0.3)+
+  facet_wrap(~Division) + 
+  theme_minimal(base_size = 13) + 
+  scale_color_viridis_c(guide = "none") + 
+  scale_y_continuous(labels = label_dollar())
+ggplotly(p)
+  # labs(x = "Largest group in Census tract", 
+  #      y = "Median household income", 
+  #      title = "Household income distribution by largest racial/ethnic group", 
+  #      subtitle = "Census tracts, New York City", 
+  #      caption = "Data source: 2016-2020 ACS")
+```
+
+```{r}
+tract_sum_tocounty <- tn_temp1 %>%
+  st_drop_geometry()%>%
+  group_by(County)%>%
+  summarize(across(.cols = where(is.numeric), .fns = ~sum(., na.rm = TRUE)))
+tract_sum_tocounty%>%
+  colnames()
+
+```
+
+
+```{r}
+list_name <- df$colname
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

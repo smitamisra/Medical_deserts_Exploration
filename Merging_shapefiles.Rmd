@@ -170,6 +170,7 @@ tn_trans$distance <- dist
 tntract_hos <- bind_cols(hospital_sf[nearest, ] %>%
                            st_drop_geometry(),
                             tn_trans)
+
                            
 
 str(tntract_hos)

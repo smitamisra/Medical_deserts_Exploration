@@ -1,0 +1,137 @@
+---
+title: "Finding the centroid for the TN county shape merged files"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+#loading library
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tibble)
+library(ggmap)
+library(sf)
+library(leaflet)
+library(htmltools)
+library(scales)
+```
+
+```{r}
+#raeding hospital_sf
+summary(hospital_sf)
+tn_heath <- readRDS("data/tncounty_region_health.rds")
+
+tn_conty_shape <- st_read('data/tl_2021_us_county/')
+tnc_sh <- tn_conty_shape %>%
+  filter(STATEFP == 47)
+tnc_sh <- merge(tnc_sh, tn_heath, by.x= "NAME", by.y = "County")
+tnhealth_sf <- st_as_sf(tnc_sh, coords = c('INTPTLON', 'INTPTLON'),
+                         crs = 4326)
+saveRDS(tnhealth_sf, "data/tnhealth_sf.rds")
+
+#tncounty_hos <- readRDS(tncounty_hos, "data/tncounty_hos.rds")
+tn_heath
+
+```
+
+```{r}
+
+#modifing the YPLL_RACE and YPLL_IDC as one column for plotting in the county
+tnhealth_long <- pivot_longer(tnhealth_sf, cols=23:27, 
+                              names_to = "YPLL_Race", 
+                              values_to = "YPLL_Race_Count")
+tnhealth_long <- pivot_longer(tnhealth_long, cols=41:45, 
+                              names_to = "IDC_Race", 
+                              values_to = "IDC_Race_Count")
+summary(tnhealth_long)
+#testing the shape file is retaining shape ad ploting
+ggplot()+geom_sf(data= tnhealth_sf)
+
+```
+
+
+```{r}
+#transforming the tn_health county level data to get the centroid for nearest search
+
+tnhealth_sf_trans <- st_transform(tnhealth_sf, crs = 4326)
+
+
+#st_centroid(tn_trans$geometry)
+tnhealth_sf_trans <- tnhealth_sf_trans %>%
+  mutate(centriod = st_centroid(tnhealth_sf_trans$geometry))
+
+nearest_tn <- st_nearest_feature(tnhealth_sf_trans, hospital_sf)
+
+dist_tn <- st_distance(tnhealth_sf_trans, 
+                    hospital_sf[nearest_tn,], by_element = TRUE) %>%
+    units::set_units(mi)
+tnhealth_sf_trans$distance <- dist_tn
+
+tncounty_hos <- bind_cols(hospital_sf[nearest_tn, ] %>%
+                           st_drop_geometry(),
+                            tnhealth_sf_trans)
+
+tncounty_hos <- saveRDS(tncounty_hos, "data/tncounty_hos.rds")
+```
+
+```{r}
+#transforming the tn_health county level data to get the centroid for nearest search
+
+tnhealth_long_trans <- st_transform(tnhealth_long, crs = 4326)
+
+
+#st_centroid(tn_trans$geometry)
+tnhealth_long_trans <- tnhealth_long_trans %>%
+  mutate(centriod = st_centroid(tnhealth_long_trans$geometry))
+
+nearest_long_tn <- st_nearest_feature(tnhealth_long_trans, hospital_sf)
+
+dist_lon_tn <- st_distance(tnhealth_long_trans, 
+                    hospital_sf[nearest_long_tn,], by_element = TRUE) %>%
+    units::set_units(mi)
+tnhealth_long_trans$distance <- dist_lon_tn
+
+tncounty_long_hos <- bind_cols(hospital_sf[nearest_long_tn, ] %>%
+                           st_drop_geometry(),
+                            tnhealth_long_trans)
+
+tncounty_long_hos <- saveRDS(tncounty_long_hos, "data/tncounty_long_hos.rds")
+```
+
+
+
+```{r}
+summary(tnhealth_sf_trans$distance)
+table(tnhealth_sf_trans$Division, useNA = "ifany")
+table(tnhealth_long$Division, useNA = "ifany")
+
+tnhealth_long%>%
+  filter(Division == "East")%>%
+  group_by(NAME, YPLL_Race)%>%
+  sum(YPLL_Race_Count, na.rm=TRUE)
+
+```
+
+```{r}
+tnhealth_long%>% 
+  summarize(across(.cols = where(is.numeric), .fns = ~mean(., na.rm = TRUE)))
+```
+```{r}
+tnhealth_long %>% 
+  group_by(Division) %>% 
+  summarize(County_count = n_distinct(NAME))%>%
+  ggplot(aes(x=Division, y=County_count))+
+  geom_col()
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
