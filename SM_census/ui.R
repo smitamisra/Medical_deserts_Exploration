@@ -78,7 +78,7 @@ shinyUI(fluidPage(
         selectInput(inputId = "s", 
                     label = "County:",
                     choices = c("All" = "All",
-                                "Davidson" = "Davidson")
+                                unique(tn_temp1$County))
         )
         ),
         # Show a plot of the generated distribution
@@ -101,8 +101,16 @@ shinyUI(fluidPage(
                      plotOutput("Hospital_Ownership"))
                      ),
                      leafletOutput("mymap")),
-            tabPanel(strong("County Health Info"), plotOutput("plot")),
-            tabPanel(strong("Table"), tableOutput("table"))
+            
+            tabPanel(strong("County tract & Hospital"),
+                     
+                     leafletOutput("map"),
+                     dataTableOutput("table")
+                     ),
+                     
+            tabPanel(strong("Table"), 
+                     #tableOutput("table"),
+                     )
           )
           
         )

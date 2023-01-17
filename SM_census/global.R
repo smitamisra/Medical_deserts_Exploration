@@ -13,6 +13,7 @@ library(sf)
 library(leaflet)
 library(htmltools)
 library(scales)
+library(units)
 
 hospital_rds <- readRDS('data/hospital_rds.rds') 
 hospital_sf = st_as_sf(hospital_rds, coords = c("lon", "lat"), 
@@ -21,5 +22,7 @@ hospital_sf = st_as_sf(hospital_rds, coords = c("lon", "lat"),
 sf_circles <- readRDS("data/sf_circles.rds") %>%
   filter(State == "TN")  
 tn_temp1 <- readRDS("data/tn_temp1.rds")
+
+county_health <-readRDS("data/county_helath.rds")
 
 
