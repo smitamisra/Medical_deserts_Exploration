@@ -120,13 +120,13 @@ shinyUI(fluidPage(
         tabPanel(strong("Home"),
                  br(),
                  br(),
-                 HTML('<div style="font-size:30px">'),
+                 HTML('<div style="font-size:20px">'),
                  HTML("<p><b>Medical desert</b> is a term used to describe regions whose population has inadequate access to healthcare. The term can be applied to general care or specific care. Different socioeconomic and demographic features impact the access to care. The app explores the health and hospital data for the state of Tennessee, USA.</p>"),
-                 HTML('<p>In this study, we are using the hospitals general information dataset from <a target="_blank" href="https://data.cms.gov/provider-data">Centers for Medicare & Medicaid Services</a> to locate the hospitals in TN. State health information was collected from the US census bureau, American community survey collection for the year 2021 (https://data.census.gov/table ).</p>'),
+                 HTML('<p>In this study, we are using the hospitals general information dataset from <a target="_blank" href="https://data.cms.gov/provider-data">Centers for Medicare & Medicaid Services</a>. Five year Tract and County level population and health matrix were gathered from the <a target="_blank" href="https://data.census.gov/table">US Census Bureau</a>, American community survey collection for the year 2021.</p>'),
                  HTML('</div>')
         ),
         
-        tabPanel(strong("Hospital location"),
+        tabPanel(strong("Hospital_Info"),
                  leafletOutput("mymap"),
                  fluidRow(
                    column(width = 6,
@@ -137,7 +137,7 @@ shinyUI(fluidPage(
                  #leafletOutput("mymap")
                  ),
         
-        tabPanel(strong("TN County/tract & Hospital"),
+        tabPanel(strong("TN:County:tract_Hospital"),
                  leafletOutput("map"),
                  fluidRow(
                    column( width = 6,
