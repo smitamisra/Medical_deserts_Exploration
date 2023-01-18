@@ -68,7 +68,7 @@ shinyServer(function(input, output) {
     hospal <- colorFactor(terrain.colors(5), tn_temp1$`Hospital Type`)
     
     popup_tntract <-
-      HTML(paste(
+      paste(
         "<b>TN_Division:</b>", tn_temp1$Division, "<br>",
         "<b>TN_County:</b>", tn_temp1$County, "<br>",
         "<b>TN_censustract:</b>", tn_temp1$NAMELSAD, "<br>",
@@ -78,21 +78,28 @@ shinyServer(function(input, output) {
         "<b>Hospital_Phone#:</b>", tn_temp1$`Phone Number`, "<br>",
         "<b>Hospital_Type:</b>", tn_temp1$`Hospital Type`, "<br>",
         "<b>Hospital_Ownership:</b>", tn_temp1$`Hospital Ownership`, "<br>",
-        "<b>Emergency Services:</b>", tn_temp1$`Emergency Services`, "<br>"))
+        "<b>Emergency Services:</b>", tn_temp1$`Emergency Services`, "<br>")%>%
+      lapply(htmltools::HTML)
     
-    popup_hos <-
-      HTML(paste(
+    pop_hos <-
+      paste(
         "<b>Hospital Name:</b>", hospital_sf$`Facility Name`, "<br>",
         "<b>Hospital City:</b>", hospital_sf$City, "<br>",
         "<b>Hospita Sate:</b>", hospital_sf$State, "<br>",
         "<b>CMS Rating:</b>", hospital_sf$`Hospital overall rating`, "<br>",
         "<b>Type :</b>", hospital_sf$`Hospital Type`, "<br>",
         "<b>Ownership:</b>", hospital_sf$`Hospital Ownership`, "<br>",
-        "<b>Emergency Services available:</b>", hospital_sf$`Emergency Services`, "<br>"))
+        "<b>Emergency Services available:</b>", hospital_sf$`Emergency Services`,
+        "<br>")%>%
+      lapply(htmltools::HTML)
+    
+    
+    
+       
     
     map <- leaflet(options = leafletOptions(minZoom = 3)) %>%
       addProviderTiles(provider = "CartoDB.PositronNoLabels") %>%
-      setView(lng = -86.7816, lat = 36.1627, zoom = 6) %>%
+      setView(lng = -86.7816, lat = 36.1627, zoom = 8) %>%
       setMaxBounds(lng1 = -86.7816 + 1, 
                    lat1 = 36.1627 + 1, 
                    lng2 = -86.7816 - 1, 
@@ -110,18 +117,19 @@ shinyServer(function(input, output) {
                    opacity = 0.8, 
                    weight = 1.5, 
                    label = ~tn_temp1$NAMELSAD)%>%
+      addPolygons(data = sf_circles%>%
+                    filter(State == "TN"), 
+                  weight = 1,
+                  fillColor = ~hospal(`Hospital Type`),
+                  opacity = 0.5)%>%
       addCircleMarkers(data = hospital_sf,
                        radius = 1,
                        color = "white",
                        weight = 1.0,
                        fillColor = "red",
                        fillOpacity = 0.75,
-                       label = popup_hos)%>%
-      addPolygons(data = sf_circles%>%
-                    filter(State == "TN"), 
-                  weight = 1,
-                  fillColor = ~hospal(`Hospital Type`),
-                  opacity = 0.5)%>%
+                       label = pop_hos)%>%
+      
       addLegend(
         pal = factpal,
         position = 'bottomleft',
