@@ -215,6 +215,7 @@ sum_variable <- tn_temp1%>%
             Race_PINH = sum(Race_PI_NH))
 
  tncounty_hos <- merge(sum_variable, tncounty_hos, by.x='County', by.y='NAME')
+ tncounty_hos2 <- saveRDS(tncounty_hos, "data/tncounty_hos2.rds")
 ```
 
 ```{r}
@@ -430,6 +431,216 @@ state <- hospital_sf%>%
 print(state)
 ```
 
+
+```{r}
+data.frame(x = tn_temp1$County,                            # Reshape data frame
+                       y = c(tn_temp1$Male_Population, 
+                             tn_temp1$Female_Population,
+                             tn_temp1$Median_Age,
+                             tn_temp1$Race_White,
+                             tn_temp1$Race_Black,
+                             tn_temp1$Race_Asian,
+                             tn_temp1$Race_AI_AN,
+                             tn_temp1$Race_PI_NH,
+                             tn_temp1$`Age10-14yrs`,
+                             tn_temp1$`Age15-19yrs`,
+                             tn_temp1$`Age20-24yrs`,
+                             tn_temp1$`Age25-34yrs`,
+                             tn_temp1$`Age35-44yrs`,
+                             tn_temp1$`Age45-54yrs`,
+                             tn_temp1$`Age5-9yrs`,
+                             tn_temp1$`Age55-59yrs`,
+                             tn_temp1$`Age60-64yrs`,
+                             tn_temp1$`Age75-14yrs`,
+                             tn_temp1$`Age<5yrs`,
+                             tn_temp1$`Age>=85yrs`)
+                             
+                       group = c(rep("y1", nrow(data)),
+                                 rep("y2", nrow(data)),
+                                 rep("y3", nrow(data))))
+```
+```{r}
+#a kernel density plot can show the overall shape of the distribution of median home values in our dataset:
+ggplot(county_health, aes(x = `Physically_Unhealthy_Days(PUD)_AvgNo`, 
+                          fill = Division)) + 
+  geom_density(alpha = 0.3)
+
+ggplot(county_health, aes(x = `Mentally_Unhealthy_Days(MUD)_AvgNo`, 
+                          fill = Division)) + 
+  geom_density(alpha = 0.3)
+```
+
+```{r}
+lm(formula = "PUD_Z_score ~distance + PCP_per100K", data = county_health)%>%
+  summary()
+
+lm_pud <- lm(formula = "PUD_Z_score ~distance + PCP_per100K + MHP_per100K + long_commute_Z_score", data = county_health)%>%
+  summary()
+
+lm_mud <- lm(formula = "MUD_Z_score ~distance + PCP_per100K + MHP_per100K + long_commute_Z_score", data = county_health)%>%
+  summary()
+lm_id <- lm(formula = "ID_Z_score ~distance + PCP_per100K + MHP_per100K + long_commute_Z_score", data = county_health)%>%
+  summary()
+
+lm_phos <- lm(formula = "Preventable_Hospitalization_per100K ~distance + PCP_per100K + MHP_per100K + long_commute_Z_score", data = county_health)%>%
+  summary()
+
+ lm(formula = "YPLL_per100K ~distance + PCP_per100K + MHP_per100K + long_commute_Z_score", data = county_health)%>%
+  summary()
+```
+
+
+```{r}
+tn_temp1
+```
+```{r}
+
+king <- tn_temp1%>%
+  st_drop_geometry()%>%
+  select(Division, County, Male_Population, Female_Population )%>%
+   group_by(Division)%>%
+  summarise(male = sum(Male_Population),
+           female = sum(Female_Population))
+
+
+
+```
+
+```{r}
+king%>%
+  pivot_longer(cols = -Division)%>%
+  #group_by(Division)%>%
+  ggplot(aes(x= name, y=value, fill = Division))+
+  geom_col(position = 'dodge')+
+  ylab("Population_count")+
+  xlab("Gender")+
+  ggtitle("Gender representation in TN:regions")
+              
+```
+
+```{r}
+tn_temp1%>%
+  group_by(Division)%>%
+  ggplot(aes(x= Division, y = distance, fill=group))+
+  geom_boxplot(position = 'dodge')+
+  ylab("Distance from Nearest hospital(miles)")+
+  xlab("TN:Regions")+
+  ggtitle("Distribution of Hospitals in TN from census tarcts")
+
+```
+
+
+
+```{r}
+tn_temp1%>%
+  group_by(Division)%>%
+  ggplot(aes(x= Division, y = Median_Household_Income, fill=group))+
+  geom_boxplot(position = 'dodge')+
+  ylab("Median_household_income($)")+
+  xlab("TN:Regions")+
+  ggtitle("Distribution of Household income in TN:regions")
+```
+
+```{r}
+tn_temp1%>%
+  group_by(Division)%>%
+  ggplot(aes(x= Division, y = Median_Age, fill=group))+
+  geom_boxplot(position = 'dodge')+
+  ylab("Median_Age")+
+  xlab("TN:Regions")+
+  ggtitle("Distribution of Median Age in TN:regions")
+```
+```{r}
+tn_temp1%>%
+  group_by(Division)%>%
+  ggplot(aes(x= Median_Age, y = Median_Household_Income, color=group))+
+  geom_point()+
+  geom_smooth()+
+  xlab("Median_Age")+
+  ylab("Median Household income")+
+  ggtitle("Relationship between Median Household income and Median Age in TN:regions")
+```
+
+
+
+
+```{r}
+race <- tn_temp1%>%
+  st_drop_geometry()%>%
+  select(Division, County, Race_White, Race_Black, Race_Asian, Race_AI_AN,Race_PI_NH  )%>%
+   group_by(Division)%>%
+  summarise(White = sum(Race_White),
+           Black  = sum(Race_Black),
+           Asian  = sum(Race_Asian),
+          AIAN  = sum(Race_AI_AN),
+          PINH  = sum(Race_PI_NH))
+race%>%
+  pivot_longer(cols = -Division)%>%
+  #group_by(Division)%>%
+  ggplot(aes(x= name, y=value, fill = Division))+
+  geom_col(position = 'dodge')+
+  xlab("Race")+
+  ylab("Population_count")+
+  ggtitle("Race distribution in TN:Regions")
+```
+
+
+```{r}
+age <- tn_temp1%>%
+  st_drop_geometry()%>%
+  select(Division, County, `Age<5yrs`, `Age5-9yrs`, `Age10-14yrs`, `Age15-19yrs`, `Age20-24yrs`,
+         `Age25-34yrs`, `Age35-44yrs`, `Age45-54yrs`, `Age55-59yrs`, `Age60-64yrs`, `Age75-14yrs`,
+         `Age>=85yrs`)%>%
+  group_by(Division)%>%
+  summarise(`Y<5`= sum(`Age<5yrs`),
+            `Y5-9` = sum(`Age5-9yrs`), 
+            `Y10-14` = sum(`Age10-14yrs`), 
+            `Y15-19` = sum(`Age15-19yrs`),
+            `Y20-24`=sum(`Age20-24yrs`),
+            `Y25-34` =  sum(`Age25-34yrs`), 
+            `Y35-44` = sum(`Age35-44yrs`),
+            `Y45-54` = sum(`Age45-54yrs`), 
+            `Y55-59` = sum(`Age55-59yrs`),
+            `Y60-64` = sum(`Age60-64yrs`),
+            `Y75-84` = sum(`Age75-14yrs`),
+          `Y>85` = sum(`Age>=85yrs`))
+age
+ age%>%
+  pivot_longer(cols = -Division)%>%
+  #group_by(Division)%>%
+  ggplot(aes(x= name, y=value, fill = Division))+
+  geom_col(position = 'dodge')+
+  xlab("Age groups")+
+  ylab("Population_count")+
+  ggtitle("Age distribution in TN:Regions")+
+  theme(axis.text.x = element_text(face="bold", color="#993333", 
+                           size=14, angle=45))
+
+```
+
+
+
+```{r}
+tn_temp1%>%
+  filter(County == "Davidson")%>%
+  ggplot(aes(x= `group`, y = distance, fill=group))+
+  geom_boxplot(position = 'dodge')+
+  ylab("Distance from Nearest hospital(miles)")+
+  xlab("TN:Regions")+
+  ggtitle("Distribution of Hospitals in selected TN:county
+          from census tarcts")
+```
+
+
+
+```{r}
+#Noteplot insurance and vehicle info per division.
+#kind and type of hospital
+#county data plot race YPLL per division, PUD, MUD, ID PCP MH raceID drivingdeaths longcommuter REGION wise.
+
+#on the app fix the home page.
+#boxplot the group_by group county data
+```
 
 
 ```{r}

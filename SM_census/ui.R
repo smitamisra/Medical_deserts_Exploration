@@ -127,13 +127,15 @@ shinyUI(fluidPage(
         ),
         
         tabPanel(strong("Hospital location"),
+                 leafletOutput("mymap"),
                  fluidRow(
                    column(width = 6,
                           plotOutput("Hospital_Type")),
                    column(width = 6,
                           plotOutput("Hospital_Ownership"))
                  ),
-                 leafletOutput("mymap")),
+                 #leafletOutput("mymap")
+                 ),
         
         tabPanel(strong("TN County/tract & Hospital"),
                  

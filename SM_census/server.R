@@ -28,7 +28,15 @@ shinyServer(function(input, output) {
     ggplot(data = filtered, aes(y = .data[[y]], 
                                 #fill = .data[[fill]]
     )) +
-      geom_bar()
+      geom_bar(fill = "blue")+
+      ylab("")+
+      xlab("Number of Facilities")+
+      ggtitle("Facility Type")+
+      theme(axis.text.x = element_text(face="bold", color="#993333", 
+                                       size=12, angle=45),
+            axis.text.y = element_text(face = "bold", color ="#993333", angle = 30 ),
+            plot.title = element_text(face = "bold", color = "blue", size = 14),
+            axis.title.x = element_text(color="blue", size=14, face="bold"))
   })
   output$Hospital_Ownership <- renderPlot({
     filtered = filtered()
@@ -38,10 +46,30 @@ shinyServer(function(input, output) {
     ggplot(data = filtered, aes(y = .data[[y]], 
                                 #fill = .data[[fill]]
     )) +
-      geom_bar()
+      geom_bar(fill = "red")+
+      ylab("")+
+      xlab("Number of Facilities")+
+      ggtitle("Ownership kind")+
+      theme(axis.text.x = element_text(face="bold", color="#993333", 
+                                       size=12, angle=45),
+            axis.text.y = element_text(face = "bold", color ="#993333", angle = 30 ),
+            plot.title = element_text(face = "bold", color = "blue", size = 14),
+            axis.title.x = element_text(color="blue", size=14, face="bold"))
   })
   
   output$mymap <- renderLeaflet({
+    
+    pop_hos <-
+      paste(
+        "<b>Hospital Name:</b>", hospital_sf$`Facility Name`, "<br>",
+        "<b>Hospital City:</b>", hospital_sf$City, "<br>",
+        "<b>Hospita Sate:</b>", hospital_sf$State, "<br>",
+        "<b>CMS Rating:</b>", hospital_sf$`Hospital overall rating`, "<br>",
+        "<b>Type :</b>", hospital_sf$`Hospital Type`, "<br>",
+        "<b>Ownership:</b>", hospital_sf$`Hospital Ownership`, "<br>",
+        "<b>Emergency Services available:</b>", hospital_sf$`Emergency Services`,
+        "<br>")%>%
+      lapply(htmltools::HTML)
     
     #render the hospital as per the states
     leaflet(options = leafletOptions(minZoom = 3)) %>%
@@ -52,12 +80,12 @@ shinyServer(function(input, output) {
                    lng2 = max(filtered()$lng), 
                    lat2 = max(filtered()$lat)) %>%
       addCircleMarkers(data = filtered(),
-                       radius = 1,
+                       radius = 2,
                        color = "white",
                        weight = 0.25,
                        fillColor = "red",
                        fillOpacity = 0.75,
-                       label = ~City)
+                       label = pop_hos)
   })
   
   output$map <- renderLeaflet({
@@ -73,7 +101,7 @@ shinyServer(function(input, output) {
         "<b>TN_County:</b>", tn_temp1$County, "<br>",
         "<b>TN_censustract:</b>", tn_temp1$NAMELSAD, "<br>",
         "<b>Distance_to_nearest_Hospital(miles):</b>", tn_temp1$distance, "<br>",
-        "<b>Nearest_Hospital:</b>", tn_temp1$`Facility ID`, "<br>",
+        "<b>Nearest_Hospital:</b>", tn_temp1$`Facility Name`, "<br>",
         "<b>Hospital_address:</b>", tn_temp1$comp_address, "<br>",
         "<b>Hospital_Phone#:</b>", tn_temp1$`Phone Number`, "<br>",
         "<b>Hospital_Type:</b>", tn_temp1$`Hospital Type`, "<br>",
