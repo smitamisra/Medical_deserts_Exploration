@@ -121,9 +121,7 @@ shinyServer(function(input, output) {
         "<br>")%>%
       lapply(htmltools::HTML)
     
-    
-    
-       
+   
     
     map <- leaflet(options = leafletOptions(minZoom = 3)) %>%
       addProviderTiles(provider = "CartoDB.PositronNoLabels") %>%
@@ -170,6 +168,27 @@ shinyServer(function(input, output) {
       filter(County == input$s)%>%
       st_drop_geometry()
   })
+  
+  output$conhos <- renderPlot({
+    
+    input_county <- input$s
+    
+    plot_conhos <- tn_temp1%>%
+      filter(County == input_county)%>%
+      ggplot(aes(x= `group`, y = distance, fill=group))+
+      geom_boxplot(position = 'dodge')+
+      ylab("Distance from Nearest hospital(miles)")+
+      xlab("")+
+      ggtitle("Tracts grouped by distance from nearest hopital in 
+              the selcted TN:county")+
+    theme(axis.text.x = element_text(face="bold", color="#993333",
+                                     size=12, angle=45),
+          axis.text.y = element_text(face = "bold", color ="#993333", angle = 30 ),
+          plot.title = element_text(face = "bold", color = "blue", size = 14),
+          axis.title.y = element_text(color="blue", size=14, face="bold"))
+    plot_conhos
+  })
+  
   
   output$table <- DT::renderDataTable({
     filtered_tract()[, c("NAMELSAD", "Division", 

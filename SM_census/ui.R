@@ -77,7 +77,7 @@ shinyUI(fluidPage(
       h6("Select a County"),
       selectInput(inputId = "s", 
                   label = "County:",
-                  choices = c("All" = "All",
+                  choices = c("None" = "None",
                               unique(tn_temp1$County))
       ),
       
@@ -86,7 +86,7 @@ shinyUI(fluidPage(
       selectInput(inputId = "d", 
                   label = "TN_region:", 
                   choices = c("All" = "All",
-                              unique(county_health$Division)),
+                              unique(county_health$Division))
       ),
                   
       #select variable for x-axis
@@ -138,9 +138,14 @@ shinyUI(fluidPage(
                  ),
         
         tabPanel(strong("TN County/tract & Hospital"),
-                 
                  leafletOutput("map"),
-                 dataTableOutput("table")
+                 fluidRow(
+                   column( width = 6,
+                          plotOutput("conhos")),
+                   column(width = 6,
+                          dataTableOutput("table"))
+                 ),
+                 
         ),
         
         tabPanel(strong("Evaluation County Health"),
