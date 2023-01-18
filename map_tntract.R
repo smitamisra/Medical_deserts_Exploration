@@ -1,11 +1,9 @@
 
 
-
-
 factpal <- colorFactor(topo.colors(5), tn_temp1$group)
 hospal <- colorFactor(terrain.colors(5), tn_temp1$`Hospital Type`)
 
-popup_hos <-
+popup_tntract <-
   paste(
     "<b>TN_Division:</b>", tn_temp1$Division, "<br>",
     "<b>TN_County:</b>", tn_temp1$County, "<br>",
@@ -17,6 +15,16 @@ popup_hos <-
     "<b>Hospital_Type:</b>", tn_temp1$`Hospital Type`, "<br>",
     "<b>Hospital_Ownership:</b>", tn_temp1$`Hospital Ownership`, "<br>",
     "<b>Emergency Services:</b>", tn_temp1$`Emergency Services`, "<br>")
+
+popup_hos <-
+  paste(
+    "<b>Hospital Name:</b>", hospital_sf$`Facility Name`, "<br>",
+    "<b>Hospital City:</b>", hospital_sf$City, "<br>",
+    "<b>Hospita Sate:</b>", hospital_sf$State, "<br>",
+    "<b>CMS Rating:</b>", hospital_sf$`Hospital overall rating`, "<br>",
+    "<b>Type :</b>", hospital_sf$`Hospital Type`, "<br>",
+    "<b>Ownership:</b>", hospital_sf$`Hospital Ownership`, "<br>",
+    "<b>Emergency Services available:</b>", hospital_sf$`Emergency Services`, "<br>")
 
 
 
@@ -32,7 +40,7 @@ map <- leaflet(options = leafletOptions(minZoom = 3)) %>%
                color = ~factpal(`group`), 
                opacity = 0.05, 
                weight = 0.5, 
-               label = popup_hos)%>%
+               label = popup_tntract)%>%
     addPolylines(data = tn_temp1%>%
                  filter(County == "Davidson")%>%
                  select(distance), 
@@ -46,7 +54,7 @@ map <- leaflet(options = leafletOptions(minZoom = 3)) %>%
                    weight = 1.0,
                    fillColor = "red",
                    fillOpacity = 0.75,
-                   label = ~`Facility Name`)%>%
+                   label = popup_hos)%>%
   addPolygons(data = sf_circles%>%
                 filter(State == "TN"), 
               weight = 1,
@@ -63,9 +71,10 @@ map
 
 
 filtered_tract <- tn_temp1%>%
-  filter(County == "Davidson")
+  filter(County = input_county)
 DT::renderDataTable({
   filtered_tract()[, c("NAMELSAD", "Divison", 
-                       "distance", "group", "Facility Name", 
+                       "distance", "group", "Facility Name", "Hospital Type", 
+                       "Hospital Ownership",
                        "State", "Median_Household_Income", "Median_Age" )]
 })
