@@ -148,7 +148,8 @@ shinyServer(function(input, output) {
                   weight = 2,
                   fillColor = ~hospal(`Hospital Type`),
                   opacity = 0.5)%>%
-      addCircleMarkers(data = hospital_sf,
+      addCircleMarkers(data = hospital_sf%>%
+                         filter(State == 'TN'),
                        radius = 2,
                        color = "white",
                        weight = 1.0,
@@ -196,7 +197,7 @@ shinyServer(function(input, output) {
   
   
   output$table <- DT::renderDataTable({
-    filtered_tract()[, c("NAMELSAD", "Division", 
+    filtered_tract()[, c("NAMELSAD", "County", "Division", 
                          "distance", "group", "Facility Name", "Hospital Type", 
                          "Hospital Ownership",
                          "State", "Median_Household_Income", "Median_Age")]
@@ -331,7 +332,7 @@ shinyServer(function(input, output) {
       summarise(Count = n_distinct(`Facility ID`))
     
     ushos <- x%>%
-      ggplot(aes(x=State, y= Count))+
+      ggplot(aes(x=State, y= Count, fill=State))+
       geom_col()+
       ylab("Number of Hospitals")+
       xlab("US_STATE")+
@@ -344,7 +345,8 @@ shinyServer(function(input, output) {
             axis.title.x = element_text(face = "bold.italic", color="blue",
                                         size=12),
             axis.title.y = element_text(face = "bold.italic", color="blue", 
-                                        size=12))
+                                        size=12),
+            legend.position = "none")
     ggplotly(ushos)
     
   })

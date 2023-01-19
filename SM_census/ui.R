@@ -77,7 +77,10 @@ shinyUI(fluidPage(
                               "Washington" = "WA",
                               "WestVirginia" = "WV",
                               "Wisconsin" = "WI",
-                              "Wyoming" = "WY")
+                              "Wyoming" = "WY",
+                              "AmericanSamoa" = "AS",
+                              "Guam" = "GU",
+                              "NorthernMarinaIsland"="MP")
       ),
       h5("Selection for TN:County:Tract Tab"),
       h6("Select a County"),
@@ -100,10 +103,10 @@ shinyUI(fluidPage(
       h6("Choose a Predictor/Explanatory Variable:"),
       selectInput(inputId = "e",
                   label = "Predictor:",
-                  choices = c("distance to hospital:"= "distance",
+                  choices = c("Distance to nearest hospital:"= "distance",
                               "Primary Care Physician/100k:" ="PCP_per100K",
-                              "Mental Healath Care Physician:" = "MHP_per100K",
-                              "Long_alone_commute(Z_score):" = "long_commute_Z_score"),
+                              "Mental Healath Care Physician/100k:" = "MHP_per100K",
+                              "Long Commute(Z-score):" = "long_commute_Z_score"),
                   selected = "distance"),
       #select variable for y-axis
       h6("Choose a Response/Outcome Variable:"),
@@ -116,6 +119,7 @@ shinyUI(fluidPage(
                               "Mentally Unhealthy days(Z-score):" = "MUD_Z_score"),
                   selected = "YPLL_per100K"),
       #select variable for color
+      h6("Choose  for visualization of data point color_coded:"),
       selectInput(inputId = "color",
                   label = "Color:",
                   choices = c("TN_region:" = "Division",
@@ -180,6 +184,7 @@ shinyUI(fluidPage(
         ),
         tabPanel(strong("Data_dictionary"),
                  br(),
+                 
                  p((strong(span("Z_Score", style = "color : blue"))), 
                    ":: (Measure - Average of state counties)/(Standard Deviation)"),
                  p((strong(span("YPLL", style = "color : blue"))),
@@ -200,6 +205,12 @@ shinyUI(fluidPage(
                    ":: American Indian / Alaskan Native"),
                  p((strong(span("PI_NH or PINH", style = "color : blue"))),
                    ":: Pacific Indian Native Hawaiian"),
+                 
+                 HTML('<div style="font-size:15px">'),
+                 
+                 HTML("<p><b>US-States and Territory 2 letter code:</b> Alabama = AL,   Alaska = AK,   American Samoa = AS, Arizona = AZ,   Arkansas = AR,   California = CA,   Colorado = CO,   Connecticut = CT,   Delaware = DE,   Florida = FL,   Georgia = GA, Guam =GU, Hawaii = HI,   Idaho = ID,   Illinois = IL,   Indiana = IN,   Iowa = IA,   Kansas = KS,   Kentucky = KY,   Louisiana = LA,   Maine = ME,   Maryland = MD,   Massachusetts = MA,   Michigan = MI,   Minnesota = MN,   Mississippi = MS,   Missouri = MO,   Montana = MT,  North Marina Island =MP, Nebraska = NE,   Nevada = NV,   NewHampshire = NH,   NewJersey = NJ,   NewMexico = NM,   NewYork = NY,   NorthCarolina = NC,   NorthDakota = ND,   Ohio = OH,   Oklahoma = OK,   Oregon = OR,   Pennsylvania = PA,   RhodeIsland = RI,   SouthCarolina = SC,   SouthDakota = SD,   Tennessee = TN,   Texas = TX,   Utah = UT,   Vermont = VT,   Virginia = VA,   Washington = WA,   WestVirginia = WV,   Wisconsin = WI,   Wyoming = WY </P>"),
+                 
+                 HTML('</div>'),
                  br()
         )
         
