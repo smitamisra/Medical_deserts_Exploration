@@ -13,7 +13,12 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Exploring access to healthcare and its potential imapct on health outcome"),
+  titlePanel(
+    h2("Medical Deserts:")
+    ),
+  titlePanel(
+    h4("Exploring access to healthcare and its potential imapct on health outcome")
+  ),
   
   # Sidebar with a slider input for number of bins
   sidebarLayout(
@@ -82,7 +87,8 @@ shinyUI(fluidPage(
                               unique(tn_temp1$County))
       ),
       
-      h6("Choice option for the Scatter plot:"),
+      h5("County Health Analysis depending upon acess to care"),
+      h6("Choice options for the linear model:"),
       #select variable for filter with division
       selectInput(inputId = "d", 
                   label = "TN_region:", 
@@ -91,16 +97,18 @@ shinyUI(fluidPage(
       ),
       
       #select variable for x-axis
+      h6("Choose a Predictor/Explanatory Variable:"),
       selectInput(inputId = "e",
-                  label = "X-axis:",
+                  label = "Predictor:",
                   choices = c("distance to hospital:"= "distance",
                               "Primary Care Physician/100k:" ="PCP_per100K",
                               "Mental Healath Care Physician:" = "MHP_per100K",
                               "Long_alone_commute(Z_score):" = "long_commute_Z_score"),
                   selected = "distance"),
       #select variable for y-axis
+      h6("Choose a Response/Outcome Variable:"),
       selectInput(inputId = "f",
-                  label = "Y-axis:",
+                  label = "Outcome:",
                   choices = c("Years of potential life lost:" = "YPLL_per100K",
                               "Rate of preventable hospitalization:" = "Preventable_Hospitalization_per100K",
                               "Injury related death(Z-score)" = "ID_Z_score",
@@ -110,12 +118,11 @@ shinyUI(fluidPage(
       #select variable for color
       selectInput(inputId = "color",
                   label = "Color:",
-                  choices = c("None" = "None",
-                              "TN_region:" = "Division",
+                  choices = c("TN_region:" = "Division",
                               "Hospital Type:" = "Hospital_type",
                               "Hospital Ownership:" = "Hospital_ownership",
                               "Emergency service available:" = "Emergency Services"),
-                  selected = "Hospital_type"),
+                  selected = "Division"),
     ),
     # Show a plot of the generated distribution
     mainPanel(
@@ -126,7 +133,9 @@ shinyUI(fluidPage(
                  HTML('<div style="font-size:20px">'),
                  HTML("<p><b>Medical desert</b> is a term used to describe regions whose population has inadequate access to healthcare. The term can be applied to general care or specific care. Different socioeconomic and demographic features impact the access to care. The app explores the health and hospital data for the state of Tennessee, USA.</p>"),
                  HTML('<p>In this study, we are using the hospitals general information dataset from <a target="_blank" href="https://data.cms.gov/provider-data">Centers for Medicare & Medicaid Services</a>. Five year Tract and County level population and health matrix were gathered from the <a target="_blank" href="https://data.census.gov/table">US Census Bureau</a>, American community survey collection for the year 2021.</p>'),
-                 HTML('</div>')
+                 HTML('</div>'),
+                 
+                 plotlyOutput("ushos")
         ),
         
         tabPanel(strong("Hospital_Info"),
@@ -153,12 +162,12 @@ shinyUI(fluidPage(
         
         tabPanel(strong("Evaluation County Health"),
                  fluidRow(
-                   column(width = 4,
+                   column(width = 3,
                           plotlyOutput("plot_x")),
-                   column(width = 4,
-                          plotOutput("plot_y")),
+                   column(width = 3,
+                          plotlyOutput("plot_y")),
                    
-                   column(width = 4,
+                   column(width = 6,
                           plotOutput("Dependency"))
                  ),
                  

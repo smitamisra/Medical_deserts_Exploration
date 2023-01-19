@@ -212,11 +212,34 @@ shinyServer(function(input, output) {
     plot_x <- plot_data%>%
       ggplot(aes(x= Division, y = .data[[input_x]], fill=.data[[input_color]]))+
       geom_boxplot(position = 'dodge')+
-      ylab("Years of Potential Life Lost Rate")+
+      ylab("Distribution of x-variable")+
       xlab("TN:Regions")+
       ggtitle("County_Health: Death")
     
     ggplotly(plot_x)
+    
+  })
+  
+  
+  output$plot_y <- renderPlotly({
+    if (input$d == "All"){
+      plot_data = county_health
+    }else{plot_data = county_health%>%
+      filter(Division == input$d)}
+    
+    input_x <- input$e
+    input_y <- input$f
+    input_color <- input$color
+    
+    
+    plot_y <- plot_data%>%
+      ggplot(aes(x= Division, y = .data[[input_y]], fill=.data[[input_color]]))+
+      geom_boxplot(position = 'dodge')+
+      ylab("Distribution of Y-variable")+
+      xlab("TN:Regions")+
+      ggtitle("County_Health: Death")
+    
+    ggplotly(plot_y)
     
   })
   
@@ -257,5 +280,26 @@ shinyServer(function(input, output) {
     formula= glue::glue("{input$f} ~{input$e}")
     lm(formula = formula, data = plot_data)%>%
       summary()
+  })
+  
+  output$ushos <- renderPlotly({
+    x= hospital_sf%>%
+      st_drop_geometry()%>%
+      group_by(State)%>%
+      summarise(Count = n_distinct(`Facility ID`))
+    
+    ushos <- x%>%
+      ggplot(aes(x=State, y= Count))+
+      geom_col()+
+      ylab("Number of Hospitals")+
+      xlab("US_STATE")+
+      ggtitle("Distribution of Hospital across US")+
+      theme(plot.title = element_text( face="bold.italic", color="blue", size=12),
+            axis.text.x = element_text(face = "bold.italic", color="blue", size=6, angle=90),
+            axis.text.y = element_text(face = "bold.italic", color="blue", size=6, angle=90),
+            axis.title.x = element_text(face = "bold.italic", color="blue", size=12),
+            axis.title.y = element_text(face = "bold.italic", color="blue", size=12))
+    ggplotly(ushos)
+    
   })
 })
