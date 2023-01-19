@@ -15,8 +15,8 @@ shinyUI(fluidPage(
   # Application title
   titlePanel(
     h2("Medical Deserts:")
-    ),
-    titlePanel(
+  ),
+  titlePanel(
     h3("Exploring access to healthcare and its potential imapct on health outcome")
   ),
   
@@ -177,7 +177,32 @@ shinyUI(fluidPage(
                  br(),
                  
                  verbatimTextOutput("lm_summary"),
+        ),
+        tabPanel(strong("Data_dictionary"),
+                 br(),
+                 p((strong(span("Z_Score", style = "color : blue"))), 
+                   ":: (Measure - Average of state counties)/(Standard Deviation)"),
+                 p((strong(span("YPLL", style = "color : blue"))),
+                   "::Years of Potential Life Lost Rate"),
+                 p((strong(span("YPLL_1000K", style = "color : blue"))), 
+                   "::Age-adjusted YPLL rate per 100,000"),
+                 p((strong(span("PUD", style = "color : blue"))), 
+                   ":: Physically Unhealthy Days"),
+                 p((strong(span("MUD", style = "color : blue"))),
+                   ":: Mentaly Unhealthy Days"),
+                 p((strong(span("PCP", style = "color : blue"))),
+                   ":: Primary Care Physician"),
+                 p((strong(span("MHP", style = "color : blue"))), 
+                   ":: Mental Healthcare Physician"),
+                 p((strong(span("ID", style = "color : blue"))), 
+                   ":: Injury related death"),
+                 p((strong(span("AI_AN or AIAN", style = "color : blue"))),
+                   ":: American Indian / Alaskan Native"),
+                 p((strong(span("PI_NH or PINH", style = "color : blue"))),
+                   ":: Pacific Indian Native Hawaiian"),
+                 br()
         )
+        
       )
       
     )
