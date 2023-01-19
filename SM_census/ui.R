@@ -16,8 +16,8 @@ shinyUI(fluidPage(
   titlePanel(
     h2("Medical Deserts:")
     ),
-  titlePanel(
-    h4("Exploring access to healthcare and its potential imapct on health outcome")
+    titlePanel(
+    h3("Exploring access to healthcare and its potential imapct on health outcome")
   ),
   
   # Sidebar with a slider input for number of bins
@@ -129,10 +129,12 @@ shinyUI(fluidPage(
       tabsetPanel(
         tabPanel(strong("Home"),
                  br(),
-                 br(),
-                 HTML('<div style="font-size:20px">'),
-                 HTML("<p><b>Medical desert</b> is a term used to describe regions whose population has inadequate access to healthcare. The term can be applied to general care or specific care. Different socioeconomic and demographic features impact the access to care. The app explores the health and hospital data for the state of Tennessee, USA.</p>"),
+                 
+                 HTML('<div style="font-size:12px">'),
+                 HTML("<p><b>Medical desert</b> is a term used to describe regions whose population has inadequate access to healthcare. The term can be applied to general care or specific care. Different socioeconomic and demographic features impact the access to care. The app explores the health and hospital data for the state of Tennessee (TN), USA.</p>"),
                  HTML('<p>In this study, we are using the hospitals general information dataset from <a target="_blank" href="https://data.cms.gov/provider-data">Centers for Medicare & Medicaid Services</a>. Five year Tract and County level population and health matrix were gathered from the <a target="_blank" href="https://data.census.gov/table">US Census Bureau</a>, American community survey collection for the year 2021.</p>'),
+                 HTML("<p>There are a total of 5299 hospitals across US 50 states. Census data is collected at State/County/tract level. In total US has 3143 counties,84,414 census tract. State of TN has three regions, 96 counties and 1701 tract. Avalability and access to resources for health care impact the overall health outcome. In this app we using different predictor varibales including prooximity(distance) to the nearest facility, which is calcuated using the census county/tract level shape file and google-maps-api.</p>"),
+                 
                  HTML('</div>'),
                  
                  plotlyOutput("ushos")
@@ -140,6 +142,7 @@ shinyUI(fluidPage(
         
         tabPanel(strong("Hospital_Info"),
                  leafletOutput("mymap"),
+                 br(),
                  fluidRow(
                    column(width = 6,
                           plotOutput("Hospital_Type")),
@@ -150,6 +153,7 @@ shinyUI(fluidPage(
         ),
         
         tabPanel(strong("TN:County:tract_Hospital"),
+                 br(),
                  leafletOutput("map"),
                  fluidRow(
                    column( width = 6,
@@ -170,6 +174,7 @@ shinyUI(fluidPage(
                    column(width = 6,
                           plotOutput("Dependency"))
                  ),
+                 br(),
                  
                  verbatimTextOutput("lm_summary"),
         )

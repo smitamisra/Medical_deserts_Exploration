@@ -145,11 +145,11 @@ shinyServer(function(input, output) {
                    label = ~tn_temp1$NAMELSAD)%>%
       addPolygons(data = sf_circles%>%
                     filter(State == "TN"), 
-                  weight = 1,
+                  weight = 2,
                   fillColor = ~hospal(`Hospital Type`),
                   opacity = 0.5)%>%
       addCircleMarkers(data = hospital_sf,
-                       radius = 1,
+                       radius = 2,
                        color = "white",
                        weight = 1.0,
                        fillColor = "red",
@@ -181,11 +181,16 @@ shinyServer(function(input, output) {
       xlab("")+
       ggtitle(glue::glue("Tracts grouped by distance from nearest hopital in 
               {input_county}:county"))+
-      theme(axis.text.x = element_text(face="bold", color="#993333",
-                                       size=12, angle=45),
-            axis.text.y = element_text(face = "bold", color ="#993333", angle = 30 ),
-            plot.title = element_text(face = "bold", color = "blue", size = 14),
-            axis.title.y = element_text(color="blue", size=14, face="bold"))
+      theme(axis.text.x = element_text(face="bold.italic", color="blue",
+                                       size=12),
+            axis.text.y = element_text(face = "bold.italic", color ="blue", 
+                                       size = 12, angle = 30),
+            plot.title = element_text(face = "bold.italic", color = "blue", 
+                                      size = 14),
+            axis.title.y = element_text(color="blue", 
+                                        size=14, face="bold.italic"),
+            legend.title = element_text(size=6),
+            legend.text = element_text(size=6))
     plot_conhos
   })
   
@@ -212,9 +217,21 @@ shinyServer(function(input, output) {
     plot_x <- plot_data%>%
       ggplot(aes(x= Division, y = .data[[input_x]], fill=.data[[input_color]]))+
       geom_boxplot(position = 'dodge')+
-      ylab("Distribution of x-variable")+
+      ylab(glue::glue("{input_x} value"))+
       xlab("TN:Regions")+
-      ggtitle("County_Health: Death")
+      ggtitle("Predictor Variable")+
+      theme(axis.text.x = element_text(face="bold.italic", color="blue",
+                                       size=6, angle=45),
+            axis.text.y = element_text(face = "bold.italic", color ="blue",
+                                       size=6, angle = 30 ),
+            plot.title = element_text(face = "bold.italic", color = "blue", 
+                                      size = 8),
+            axis.title.x = element_text(face = "bold.italic", 
+                                        color="blue", size=8),
+            axis.title.y = element_text(face = "bold.italic", 
+                                        color="blue", size=8),
+            legend.title = element_text(size=6),
+            legend.text = element_text(size=6))
     
     ggplotly(plot_x)
     
@@ -235,9 +252,21 @@ shinyServer(function(input, output) {
     plot_y <- plot_data%>%
       ggplot(aes(x= Division, y = .data[[input_y]], fill=.data[[input_color]]))+
       geom_boxplot(position = 'dodge')+
-      ylab("Distribution of Y-variable")+
+      ylab(glue::glue("{input_y} value"))+
       xlab("TN:Regions")+
-      ggtitle("County_Health: Death")
+      ggtitle("Outcome Variable")+
+            theme(axis.text.x = element_text(face="bold.italic", color="blue",
+                                       size=6, angle=45),
+            axis.text.y = element_text(face = "bold.italic", color ="blue",
+                                       size=6, angle = 30 ),
+            plot.title = element_text(face = "bold.italic", color = "blue", 
+                                      size = 8),
+            axis.title.x = element_text(face = "bold.italic", 
+                                        color="blue", size=8),
+            axis.title.y = element_text(face = "bold.italic", 
+                                        color="blue", size=8),
+            legend.title = element_text(size=6),
+            legend.text = element_text(size=6))
     
     ggplotly(plot_y)
     
@@ -264,11 +293,24 @@ shinyServer(function(input, output) {
       geom_smooth(method = "lm")+
       xlab(input$e)+
       ylab(input$f)+
-      ggtitle("Relationship among chosen variables") +
+      ggtitle("Simple Regression (lm)") +
       theme(text = element_text(size = 15),
             legend.text = element_text(),
             plot.title = element_text(size = rel(2)),
-            axis.text.x = element_text(angle = 90, hjust = 0.2))
+            axis.text.x = element_text(angle = 90, hjust = 0.2)) +
+            theme(axis.text.x = element_text(face="bold.italic", color="blue",
+                                       size=8, angle=45),
+            axis.text.y = element_text(face = "bold.italic", color ="blue",
+                                       size=8, angle = 30 ),
+            plot.title = element_text(face = "bold.italic", color = "blue", 
+                                      size = 12),
+            axis.title.x = element_text(face = "bold.italic", 
+                                        color="blue", size=12),
+            axis.title.y = element_text(face = "bold.italic", 
+                                        color="blue", size=10),
+            legend.title = element_text(size=6),
+            legend.text = element_text(size=6))
+    
   })
   output$lm_summary <- renderPrint({
     if (input$d == "All"){
@@ -295,10 +337,14 @@ shinyServer(function(input, output) {
       xlab("US_STATE")+
       ggtitle("Distribution of Hospital across US")+
       theme(plot.title = element_text( face="bold.italic", color="blue", size=12),
-            axis.text.x = element_text(face = "bold.italic", color="blue", size=6, angle=90),
-            axis.text.y = element_text(face = "bold.italic", color="blue", size=6, angle=90),
-            axis.title.x = element_text(face = "bold.italic", color="blue", size=12),
-            axis.title.y = element_text(face = "bold.italic", color="blue", size=12))
+            axis.text.x = element_text(face = "bold.italic", color="blue", 
+                                       size=6, angle=90),
+            axis.text.y = element_text(face = "bold.italic", color="blue", 
+                                       size=6, angle=90),
+            axis.title.x = element_text(face = "bold.italic", color="blue",
+                                        size=12),
+            axis.title.y = element_text(face = "bold.italic", color="blue", 
+                                        size=12))
     ggplotly(ushos)
     
   })
