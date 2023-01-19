@@ -13,15 +13,15 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Medical Deserts Identification"),
+  titlePanel("Exploring access to healthcare and its potential imapct on health outcome"),
   
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
-      h3("MAP"),
+      h5("Selection for Hospital_info Tab"),
       h6("Select a state to plot the hospitals on map"),
       selectInput(inputId = "z", 
-                  label = "Hospital:",
+                  label = "State:",
                   choices = c("All" = "All",
                               "Alabama" = "AL",
                               "Alaska" = "AK",
@@ -74,6 +74,7 @@ shinyUI(fluidPage(
                               "Wisconsin" = "WI",
                               "Wyoming" = "WY")
       ),
+      h5("Selection for TN:County:Tract Tab"),
       h6("Select a County"),
       selectInput(inputId = "s", 
                   label = "County:",
@@ -88,7 +89,7 @@ shinyUI(fluidPage(
                   choices = c("All" = "All",
                               unique(county_health$Division))
       ),
-                  
+      
       #select variable for x-axis
       selectInput(inputId = "e",
                   label = "X-axis:",
@@ -109,7 +110,9 @@ shinyUI(fluidPage(
       #select variable for color
       selectInput(inputId = "color",
                   label = "Color:",
-                  choices = c("Hospital Type:" = "Hospital_type",
+                  choices = c("None" = "None",
+                              "TN_region:" = "Division",
+                              "Hospital Type:" = "Hospital_type",
                               "Hospital Ownership:" = "Hospital_ownership",
                               "Emergency service available:" = "Emergency Services"),
                   selected = "Hospital_type"),
@@ -135,13 +138,13 @@ shinyUI(fluidPage(
                           plotOutput("Hospital_Ownership"))
                  ),
                  #leafletOutput("mymap")
-                 ),
+        ),
         
         tabPanel(strong("TN:County:tract_Hospital"),
                  leafletOutput("map"),
                  fluidRow(
                    column( width = 6,
-                          plotOutput("conhos")),
+                           plotOutput("conhos")),
                    column(width = 6,
                           dataTableOutput("table"))
                  ),
@@ -149,7 +152,16 @@ shinyUI(fluidPage(
         ),
         
         tabPanel(strong("Evaluation County Health"),
-                 plotOutput("Dependency"),
+                 fluidRow(
+                   column(width = 4,
+                          plotlyOutput("plot_x")),
+                   column(width = 4,
+                          plotOutput("plot_y")),
+                   
+                   column(width = 4,
+                          plotOutput("Dependency"))
+                 ),
+                 
                  verbatimTextOutput("lm_summary"),
         )
       )

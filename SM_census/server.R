@@ -121,7 +121,7 @@ shinyServer(function(input, output) {
         "<br>")%>%
       lapply(htmltools::HTML)
     
-   
+    
     
     map <- leaflet(options = leafletOptions(minZoom = 3)) %>%
       addProviderTiles(provider = "CartoDB.PositronNoLabels") %>%
@@ -179,13 +179,13 @@ shinyServer(function(input, output) {
       geom_boxplot(position = 'dodge')+
       ylab("Distance from Nearest hospital(miles)")+
       xlab("")+
-      ggtitle("Tracts grouped by distance from nearest hopital in 
-              the selcted TN:county")+
-    theme(axis.text.x = element_text(face="bold", color="#993333",
-                                     size=12, angle=45),
-          axis.text.y = element_text(face = "bold", color ="#993333", angle = 30 ),
-          plot.title = element_text(face = "bold", color = "blue", size = 14),
-          axis.title.y = element_text(color="blue", size=14, face="bold"))
+      ggtitle(glue::glue("Tracts grouped by distance from nearest hopital in 
+              {input_county}:county"))+
+      theme(axis.text.x = element_text(face="bold", color="#993333",
+                                       size=12, angle=45),
+            axis.text.y = element_text(face = "bold", color ="#993333", angle = 30 ),
+            plot.title = element_text(face = "bold", color = "blue", size = 14),
+            axis.title.y = element_text(color="blue", size=14, face="bold"))
     plot_conhos
   })
   
@@ -195,6 +195,28 @@ shinyServer(function(input, output) {
                          "distance", "group", "Facility Name", "Hospital Type", 
                          "Hospital Ownership",
                          "State", "Median_Household_Income", "Median_Age")]
+    
+  })
+  
+  output$plot_x <- renderPlotly({
+    if (input$d == "All"){
+      plot_data = county_health
+    }else{plot_data = county_health%>%
+      filter(Division == input$d)}
+    
+    input_x <- input$e
+    input_y <- input$f
+    input_color <- input$color
+    
+    
+    plot_x <- plot_data%>%
+      ggplot(aes(x= Division, y = .data[[input_x]], fill=.data[[input_color]]))+
+      geom_boxplot(position = 'dodge')+
+      ylab("Years of Potential Life Lost Rate")+
+      xlab("TN:Regions")+
+      ggtitle("County_Health: Death")
+    
+    ggplotly(plot_x)
     
   })
   
