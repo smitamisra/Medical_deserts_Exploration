@@ -355,11 +355,11 @@ shinyServer(function(input, output) {
       summarise(Count = n_distinct(`Facility ID`))
     
     ushos <- x%>%
-      ggplot(aes(x=State, y= Count, fill=State))+
+      ggplot(aes(x=State, y= Count, fill= State))+
       geom_col()+
       ylab("Number of Hospitals")+
-      xlab("US_STATE")+
-      ggtitle("Distribution of Hospital across US")+
+      xlab("States and Union Territories")+
+      ggtitle("Hospitals distribution across United States")+
       theme(plot.title = element_text( face="bold.italic", color="blue", size=12),
             axis.text.x = element_text(face = "bold.italic", color="blue", 
                                        size=6, angle=90),
