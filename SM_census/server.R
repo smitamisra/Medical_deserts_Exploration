@@ -312,8 +312,10 @@ shinyServer(function(input, output) {
       #facet_wrap(input_facet)+
       geom_point(alpha = 0.5) + 
       geom_smooth(method = "lm")+
-      xlab(input$e)+
-      ylab(input$f)+
+      xlab(glue::glue("{labels[input$e]}"))+
+      #xlab(input$e)+
+      #ylab(input$f)+
+      ylab(glue::glue("{labels[input$f]}"))+
       ggtitle("Simple Regression (lm)") +
       theme(text = element_text(size = 15),
             legend.text = element_text(),
@@ -329,8 +331,9 @@ shinyServer(function(input, output) {
                                         color="blue", size=12),
             axis.title.y = element_text(face = "bold.italic", 
                                         color="blue", size=10),
-            legend.title = element_text(size=6),
-            legend.text = element_text(size=6))
+            legend.title = element_text(size=12),
+            legend.text = element_text(size=10),
+            legend.position = 'right')
     
   })
   output$lm_summary <- renderPrint({
