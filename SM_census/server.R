@@ -235,7 +235,8 @@ shinyServer(function(input, output) {
     plot_x <- plot_data%>%
       ggplot(aes(x= Division, y = .data[[input_x]], fill=.data[[input_color]]))+
       geom_boxplot(position = 'dodge')+
-      ylab(glue::glue("{input_x} value"))+
+      #ylab(glue::glue("{input_x} value"))+
+      ylab(glue::glue("{labels[input_x]}"))+
       xlab("TN:Regions")+
       ggtitle("Predictor Variable")+
       theme(axis.text.x = element_text(face="bold.italic", color="blue",
@@ -249,7 +250,8 @@ shinyServer(function(input, output) {
             axis.title.y = element_text(face = "bold.italic", 
                                         color="blue", size=8),
             legend.title = element_text(size=6),
-            legend.text = element_text(size=6))
+            legend.text = element_text(size=6),
+            legend.position = "none")
     
     ggplotly(plot_x)
     
@@ -270,7 +272,7 @@ shinyServer(function(input, output) {
     plot_y <- plot_data%>%
       ggplot(aes(x= Division, y = .data[[input_y]], fill=.data[[input_color]]))+
       geom_boxplot(position = 'dodge')+
-      ylab(glue::glue("{labels[input_y]} value"))+
+      ylab(glue::glue("{labels[input_y]}"))+
       xlab("TN:Regions")+
       ggtitle("Outcome Variable")+
             theme(axis.text.x = element_text(face="bold.italic", color="blue",
@@ -284,7 +286,8 @@ shinyServer(function(input, output) {
             axis.title.y = element_text(face = "bold.italic", 
                                         color="blue", size=8),
             legend.title = element_text(size=6),
-            legend.text = element_text(size=6))
+            legend.text = element_text(size=6),
+            legend.position = "none")
     
     ggplotly(plot_y)
     
