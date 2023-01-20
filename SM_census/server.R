@@ -61,13 +61,13 @@ shinyServer(function(input, output) {
     
     pop_hos <-
       paste(
-        "<b>Hospital Name:</b>", hospital_sf$`Facility Name`, "<br>",
-        "<b>Hospital City:</b>", hospital_sf$City, "<br>",
-        "<b>Hospita Sate:</b>", hospital_sf$State, "<br>",
-        "<b>CMS Rating:</b>", hospital_sf$`Hospital overall rating`, "<br>",
-        "<b>Type :</b>", hospital_sf$`Hospital Type`, "<br>",
-        "<b>Ownership:</b>", hospital_sf$`Hospital Ownership`, "<br>",
-        "<b>Emergency Services available:</b>", hospital_sf$`Emergency Services`,
+        "<b>Hospital Name:</b>", filtered()$`Facility Name`, "<br>",
+        "<b>Hospital City:</b>", filtered()$City, "<br>",
+        "<b>Hospita Sate:</b>", filtered()$State, "<br>",
+        "<b>CMS Rating:</b>", filtered()$`Hospital overall rating`, "<br>",
+        "<b>Type :</b>", filtered()$`Hospital Type`, "<br>",
+        "<b>Ownership:</b>", filtered()$`Hospital Ownership`, "<br>",
+        "<b>Emergency Services available:</b>", filtered()$`Emergency Services`,
         "<br>")%>%
       lapply(htmltools::HTML)
     
@@ -109,15 +109,18 @@ shinyServer(function(input, output) {
         "<b>Emergency Services:</b>", tn_temp1$`Emergency Services`, "<br>")%>%
       lapply(htmltools::HTML)
     
-    pop_hos <-
+   tncont_pop<- hospital_sf%>%
+      filter(State == 'TN')
+    
+    pop_hos_tn <-
       paste(
-        "<b>Hospital Name:</b>", hospital_sf$`Facility Name`, "<br>",
-        "<b>Hospital City:</b>", hospital_sf$City, "<br>",
-        "<b>Hospita Sate:</b>", hospital_sf$State, "<br>",
-        "<b>CMS Rating:</b>", hospital_sf$`Hospital overall rating`, "<br>",
-        "<b>Type :</b>", hospital_sf$`Hospital Type`, "<br>",
-        "<b>Ownership:</b>", hospital_sf$`Hospital Ownership`, "<br>",
-        "<b>Emergency Services available:</b>", hospital_sf$`Emergency Services`,
+        "<b>Hospital Name:</b>", tncont_pop$`Facility Name`, "<br>",
+        "<b>Hospital City:</b>", tncont_pop$City, "<br>",
+        "<b>Hospita Sate:</b>", tncont_pop$State, "<br>",
+        "<b>CMS Rating:</b>", tncont_pop$`Hospital overall rating`, "<br>",
+        "<b>Type :</b>", tncont_pop$`Hospital Type`, "<br>",
+        "<b>Ownership:</b>", tncont_pop$`Hospital Ownership`, "<br>",
+        "<b>Emergency Services available:</b>", tncont_pop$`Emergency Services`,
         "<br>")%>%
       lapply(htmltools::HTML)
     
@@ -155,7 +158,7 @@ shinyServer(function(input, output) {
                        weight = 1.0,
                        fillColor = "red",
                        fillOpacity = 0.75,
-                       label = pop_hos)%>%
+                       label = pop_hos_tn)%>%
       
       addLegend(
         pal = factpal,
@@ -253,7 +256,7 @@ shinyServer(function(input, output) {
     plot_y <- plot_data%>%
       ggplot(aes(x= Division, y = .data[[input_y]], fill=.data[[input_color]]))+
       geom_boxplot(position = 'dodge')+
-      ylab(glue::glue("{input_y} value"))+
+      ylab(glue::glue("{labels[input_y]} value"))+
       xlab("TN:Regions")+
       ggtitle("Outcome Variable")+
             theme(axis.text.x = element_text(face="bold.italic", color="blue",

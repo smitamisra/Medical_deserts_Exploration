@@ -17,7 +17,7 @@ shinyUI(fluidPage(
     h2("Medical Deserts:")
   ),
   titlePanel(
-    h3("Exploring access to healthcare and its potential imapct on health outcome")
+    h3("Exploring access to healthcare and its potential impact on health outcome")
   ),
   
   # Sidebar with a slider input for number of bins

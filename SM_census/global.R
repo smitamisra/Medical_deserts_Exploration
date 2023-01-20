@@ -25,6 +25,9 @@ tn_temp1 <- readRDS("data/tn_temp1.rds")
 
 county_health <-readRDS("data/county_helath.rds")
 
-
+labels <- c(
+  "Physically_Unhealthy_Days(PUD)_AvgNo" = "Physically Unhealth Days (Avg No)",
+  "YPLL_per100K" = "Years of Potential Life Lost Rate"
+)
 
 
