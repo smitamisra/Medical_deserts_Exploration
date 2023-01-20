@@ -23,6 +23,9 @@ sf_circles <- readRDS("data/sf_circles.rds") %>%
   filter(State == "TN")  
 tn_temp1 <- readRDS("data/tn_temp1.rds")
 
+tn_temp1 <- tn_temp1%>%
+  mutate(distance = round(distance, 3))
+
 county_health <-readRDS("data/county_helath.rds")
 
 labels <- c(

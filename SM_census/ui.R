@@ -87,7 +87,8 @@ shinyUI(fluidPage(
       selectInput(inputId = "s", 
                   label = "County:",
                   choices = c("None" = "None",
-                              unique(tn_temp1$County))
+                              unique(tn_temp1$County)),
+                  selected = ("Davidson")
       ),
       
       h5("County Health Analysis depending upon acess to care"),

@@ -163,7 +163,8 @@ shinyServer(function(input, output) {
       addLegend(
         pal = factpal,
         position = 'bottomleft',
-        values = factor(tn_temp1$group),
+        values = factor(tn_temp1$group, 
+                        level=c('close', 'nearby', 'mid', 'far', 'away', 'beyond')),
         title = 'Distance to facility')
     
     map})
@@ -178,11 +179,21 @@ shinyServer(function(input, output) {
     input_county <- input$s
     
     plot_conhos <- tn_temp1%>%
+      mutate(distance = round(distance, 3))%>%
       filter(County == input_county)%>%
-      ggplot(aes(x= `group`, y = distance, fill=group))+
-      geom_boxplot(position = 'dodge')+
-      ylab("Distance from Nearest hospital(miles)")+
-      xlab("")+
+      group_by(`group`)%>%
+      count()%>%
+      ggplot(aes(x= factor(`group`, level=c('close', 'nearby', 'mid', 'far', 'away', 'beyond')),
+                 y = n, fill=group))+
+      geom_col(position = 'dodge')+
+      ylab(glue::glue("Number of census tarct in {input_county} county"))+
+      xlab("Grouped by proximity to nearest hospital")+
+      # tn_temp1%>%
+      # filter(County == input_county)%>%
+      # ggplot(aes(x= `group`, y = distance, fill=group))+
+      # geom_col(position = 'dodge')+
+      # ylab("Distance from Nearest hospital(miles)")+
+      # xlab("")+
       ggtitle(glue::glue("Tracts grouped by distance from nearest hopital in 
               {input_county}:county"))+
       theme(axis.text.x = element_text(face="bold.italic", color="blue",
@@ -191,10 +202,13 @@ shinyServer(function(input, output) {
                                        size = 12, angle = 30),
             plot.title = element_text(face = "bold.italic", color = "blue", 
                                       size = 14),
+            axis.title.x = element_text(color="blue", 
+                                        size=12, face="bold.italic"),
             axis.title.y = element_text(color="blue", 
-                                        size=14, face="bold.italic"),
+                                        size=12, face="bold.italic"),
             legend.title = element_text(size=6),
-            legend.text = element_text(size=6))
+            legend.text = element_text(size=6),
+            legend.position = "none")
     plot_conhos
   })
   
