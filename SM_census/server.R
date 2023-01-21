@@ -359,7 +359,7 @@ shinyServer(function(input, output) {
       geom_col()+
       ylab("Number of Hospitals")+
       xlab("States and Union Territories")+
-      ggtitle("Hospitals distribution across United States")+
+      ggtitle("Statewide distribution of hospitals across United States")+
       theme(plot.title = element_text( face="bold.italic", color="blue", size=12),
             axis.text.x = element_text(face = "bold.italic", color="blue", 
                                        size=6, angle=90),
