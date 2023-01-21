@@ -28,7 +28,8 @@ tn_temp1 <- tn_temp1%>%
 
 #county_health <-readRDS("data/county_helath.rds")
 
-county_health <-readRDS("data/county_health_mod.rds")
+#county_health <-readRDS("data/county_health_mod.rds")
+county_health <-readRDS("data/countyhealthinfo.rds")
 
 
 # labels <- c(
@@ -98,6 +99,12 @@ labels <- c(
   "No_Vehicle"   = "Number of People Own_Vehicle (No)"      ,
   "Yes_insurance" = "Number of People With_Insurance"        ,
   "distance_tohos" = "Distance to hospital (mile)"        ,
-  "Total_pop" = "Total Population (Tract sum)"
-  )
+  "Total_pop" = "Total Population (Tract sum)",
+  "Length_of_Life" = "Length of Life(Z-Score)",	
+  "Qyuality_of_life"	= "Qyuality of life(Z-Score)",
+  "Health_Behaviors" = "Health Behaviors(Z-Score)",
+  "Clinical_Care"	= "Clinical Care(Z-Score)",
+  "Socioeconomic_factors"="Socioeconomic factors(Z-Score)",	
+  "Physical_Environment" = "Physical Environment(Z-Score)"
+)
 
