@@ -120,10 +120,11 @@ shinyUI(fluidPage(
       selectInput(inputId = "f",
                   label = "Outcome:",
                   choices = c("Years of potential life lost:" = "YPLL_per100K",
+                              "Clinical Care(Z-Score)"	= "Clinical_Care",
                               "Length of Life(Z-Score)" = "Length_of_Life",	
                               "Qyuality of life(Z-Score)"	= "Qyuality_of_life",
                               "Health Behaviors(Z-Score)" = "Health_Behaviors",
-                              "Clinical Care(Z-Score)"	= "Clinical_Care",
+                              #"Clinical Care(Z-Score)"	= "Clinical_Care",
                               "Rate of preventable hospitalization:" = "Preventable_Hospitalization_per100K",
                               "Injury related death(Z-score)" = "ID_Z_score",
                               "Physically Unhealthy days(Z-score):" = "PUD_Z_score",
@@ -201,6 +202,17 @@ shinyUI(fluidPage(
                  HTML("<p><b>Years of Potential Life lost(YPLL):</b>is an estimate of the average years a person would have lived if they had not died prematurely. It is, therefore, a measure of premature mortality.</p>"),
                  HTML("<p><b>Rate</b>is used when values are reported per 100000 units</p>"),
                  HTML("<p><b>Z-Score</b>are calculated using the following equation <b>(Measure - Average of state counties)/(Standard Deviation)</b></p>"),
+                 
+                 HTML("<p><b>HEALTH OUTCOME:</b> measure Length and quality of life</p>"),
+                 HTML("<p><b>HEALTH BEHAVIORS: </b>  Tobacco Use, Diet & Exercise, Alcohol & Drug Use, Sexual Activity</p>"),
+                 
+                 HTML("<p><b>CLINICAL CARE: </b>  Access to care and Quality of care</p>"),
+                 
+                 HTML("<p><b>SOCIOECONOMIC FACTORS: </b>  Education, Employment, Income, Family & Social Support, Community Support</p>"),
+                 
+                 HTML("<p><b>PHYSICA ENVIRONMENT: </b>  Air and water quality, Housing and Transit</p>"),
+                 
+                 
                  HTML("<p><b>Physically Unhealthy days(PUD)</b> are reported per month</p>"),
                  HTML("<p><b>Mentally Unheathy Days (MUD)</b> are reported per month</p>"),
                  HTML("<p>PCP is for Primary Care Physician</p>"),
