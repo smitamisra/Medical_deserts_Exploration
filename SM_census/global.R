@@ -97,7 +97,7 @@ labels <- c(
   "Yes_vehicle"  = "Number of People Own_Vehicle (Yes)"    ,
   "No_Vehicle"   = "Number of People Own_Vehicle (No)"      ,
   "Yes_insurance" = "Number of People With_Insurance"        ,
-  "distance_tohos" = "Distance to hospital(Tract Sum)"        ,
+  "distance_tohos" = "Distance to hospital (mile)"        ,
   "Total_pop" = "Total Population (Tract sum)"
   )
 
